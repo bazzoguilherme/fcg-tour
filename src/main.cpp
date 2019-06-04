@@ -5,10 +5,15 @@
 //    INF01047 Fundamentos de Computação Gráfica
 //               Prof. Eduardo Gastal
 //
-//                   Trabalho Final
+//                   LABORATÓRIO 2
 //
-//          Alunos: Bernardo Hummes
-//                  Guilherme Bazzo
+
+// Arquivos "headers" padrões de C podem ser incluídos em um
+// programa C++, sendo necessário somente adicionar o caractere
+// "c" antes de seu nome, e remover o sufixo ".h". Exemplo:
+//    #include <stdio.h> // Em C
+//  vira
+//    #include <cstdio> // Em C++
 //
 #include <cmath>
 #include <cstdio>
@@ -99,12 +104,6 @@ float g_AngleZ = 0.0f;
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
 // pressionado no momento atual. Veja função MouseButtonCallback().
 bool g_LeftMouseButtonPressed = false;
-bool g_AButtonPressed = false;
-bool g_DButtonPressed = false;
-bool g_WButtonPressed = false;
-bool g_SButtonPressed = false;
-
-bool g_UseFreeCamera = true; // muda camera
 
 // Variáveis que definem a câmera em coordenadas esféricas, controladas pelo
 // usuário através do mouse (veja função CursorPosCallback()). A posição
@@ -113,6 +112,14 @@ bool g_UseFreeCamera = true; // muda camera
 float g_CameraTheta = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
 float g_CameraPhi = 0.0f;   // Ângulo em relação ao eixo Y
 float g_CameraDistance = 2.5f; // Distância da câmera para a origem
+
+// Inicializa distância da câmera ao ponto (0,0,0) global
+float g_CamDistanceX = 0.0f;
+float g_CamDistanceY = 0.0f;
+float g_CamDistanceZ = 2.5f;
+
+// flags para teclas walkaround
+int pressedW =0, pressedS=0, pressedA=0, pressedD=0;
 
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
@@ -149,7 +156,7 @@ int main()
     // Criamos uma janela do sistema operacional, com 800 colunas e 800 linhas
     // de pixels, e com título "INF01047 ...".
     GLFWwindow* window;
-    window = glfwCreateWindow(800, 800, "INF01047 - 287689 - Bernardo Hummes Flores", NULL, NULL);
+    window = glfwCreateWindow(800, 800, "INF01047 - 00287687 - Guilherme Torresan Bazzo", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -188,6 +195,29 @@ int main()
 
     printf("GPU: %s, %s, OpenGL %s, GLSL %s\n", vendor, renderer, glversion, glslversion);
 
+    // Carregamos os shaders de vértices e de fragmentos que serão utilizados
+    // para renderização. Veja slides 217-219 do documento "Aula_03_Rendering_Pipeline_Grafico.pdf".
+    //
+    // Note que o caminho para os arquivos "shader_vertex.glsl" e
+    // "shader_fragment.glsl" estão fixados, sendo que assumimos a existência
+    // da seguinte estrutura no sistema de arquivos:
+    //
+    //    + FCG_Lab_0X/
+    //    |
+    //    +--+ bin/
+    //    |  |
+    //    |  +--+ Release/  (ou Debug/ ou Linux/)
+    //    |     |
+    //    |     o-- main.exe
+    //    |
+    //    +--+ src/
+    //       |
+    //       o-- shader_vertex.glsl
+    //       |
+    //       o-- shader_fragment.glsl
+    //       |
+    //       o-- ...
+    //
     GLuint vertex_shader_id = LoadShader_Vertex("../../src/shader_vertex.glsl");
     GLuint fragment_shader_id = LoadShader_Fragment("../../src/shader_fragment.glsl");
 
@@ -216,11 +246,6 @@ int main()
     glm::mat4 the_projection;
     glm::mat4 the_model;
     glm::mat4 the_view;
-
-    glm::vec4 camera_position_c = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    glm::vec4 camera_lookat_l;
-    glm::vec4 camera_view_vector;
-    glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -253,47 +278,61 @@ int main()
         // controladas pelo mouse do usuário. Veja as funções CursorPosCallback()
         // e ScrollCallback().
         float r = g_CameraDistance;
-        float y = r*sin(g_CameraPhi);
-        float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
-        float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
 
-        if (!g_UseFreeCamera)
+        // Cálculos trigonométricos salvos para economizar recursos computacionais
+        float sin_g_CameraPhi = sin(g_CameraPhi);
+        float cos_g_CameraPhi = cos(g_CameraPhi);
+        float sin_g_CameraTheta = sin(g_CameraTheta);
+        float cos_g_CameraTheta = cos(g_CameraTheta);
+
+        // Coordenadas do view vector
+        float y = r*sin_g_CameraPhi;
+        float z = r*cos_g_CameraPhi*cos_g_CameraTheta;
+        float x = r*cos_g_CameraPhi*sin_g_CameraTheta;
+
+        // Constante de movimento para reposicionamento da câmera com WASD keys
+        float movimento = 0.02f;
+
+        // Caso o usuário esteja caminhando pela cena virtual, alguma flag de "tecla
+        // pressionada" estará ativada (ver função KeyCallback). Para as ativas,
+        // atualiza as coordenadas globais X Y Z da posição da câmera, decompondo,
+        // nas coordenadas base do plano cartesiano, o "passo" de movimento
+        // na direção desejada de acordo com o ângulo do view vector.
+
+        if (pressedW)
         {
-            // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
-            // Veja slides 172-182 do documento "Aula_08_Sistemas_de_Coordenadas.pdf".
-            camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
-            camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-            camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
-            //camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+            g_CamDistanceY -= (movimento*sin_g_CameraPhi);
+            g_CamDistanceZ -= (movimento*cos_g_CameraPhi * cos_g_CameraTheta);
+            g_CamDistanceX -= (movimento*cos_g_CameraPhi * sin_g_CameraTheta);
         }
-        else
+
+        if (pressedS)
         {
-            camera_view_vector = glm::vec4(-x,-y,-z,0.0f);
-
-            if (g_WButtonPressed)
-            {
-                camera_position_c.x += 0.01*camera_view_vector.x;
-                camera_position_c.y += 0.01*camera_view_vector.y;
-                camera_position_c.z += 0.01*camera_view_vector.z;
-            }
-
-            if (g_AButtonPressed)
-            {
-                camera_position_c -= (crossproduct(camera_view_vector, camera_up_vector) / (float)sqrt(dotproduct(crossproduct(camera_up_vector, camera_view_vector), crossproduct(camera_up_vector, camera_view_vector))))/(float)50;
-            }
-
-            if (g_SButtonPressed)
-            {
-                camera_position_c.x -= 0.01*camera_view_vector.x;
-                camera_position_c.y -= 0.01*camera_view_vector.y;
-                camera_position_c.z -= 0.01*camera_view_vector.z;
-            }
-
-            if (g_DButtonPressed)
-            {
-                camera_position_c += (crossproduct(camera_view_vector, camera_up_vector) / (float)sqrt(dotproduct(crossproduct(camera_up_vector, camera_view_vector), crossproduct(camera_up_vector, camera_view_vector))))/(float)50;
-            }
+            g_CamDistanceY += (movimento*sin_g_CameraPhi);
+            g_CamDistanceZ += (movimento*cos_g_CameraPhi * cos_g_CameraTheta);
+            g_CamDistanceX += (movimento*cos_g_CameraPhi * sin_g_CameraTheta);
         }
+
+        if (pressedA)
+        {
+            g_CamDistanceX -= (movimento*cos_g_CameraPhi * cos_g_CameraTheta);
+            g_CamDistanceZ += (movimento*cos_g_CameraPhi * sin_g_CameraTheta);
+        }
+
+        if (pressedD)
+        {
+            g_CamDistanceX += (movimento*cos_g_CameraPhi * cos_g_CameraTheta);
+            g_CamDistanceZ -= (movimento*cos_g_CameraPhi * sin_g_CameraTheta);
+        }
+
+        // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
+        // Veja slide 159 do documento "Aula_08_Sistemas_de_Coordenadas.pdf".
+        glm::vec4 camera_position_c  = glm::vec4(g_CamDistanceX,g_CamDistanceY,g_CamDistanceZ,1.0f); // Ponto "c", centro da câmera
+        glm::vec4 camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+        glm::vec4 camera_view_vector = glm::vec4(-x, -y, -z, 0.0);
+        //glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
+        glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+
         // Computamos a matriz "View" utilizando os parâmetros da câmera para
         // definir o sistema de coordenadas da câmera.  Veja slide 186 do documento "Aula_08_Sistemas_de_Coordenadas.pdf".
         glm::mat4 view = Matrix_Camera_View(camera_position_c, camera_view_vector, camera_up_vector);
@@ -1084,61 +1123,18 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         g_ShowInfoText = !g_ShowInfoText;
     }
 
-    // toggle da camera se o usuário apertar C
-    if (key == GLFW_KEY_C && action == GLFW_PRESS)
-    {
-        g_UseFreeCamera = !g_UseFreeCamera;
-    }
-
-    // testa WASD
-    if (key == GLFW_KEY_W)
-    {
-        if (action == GLFW_PRESS)
-        {
-            g_WButtonPressed = true;
-        }
-        else if (action == GLFW_RELEASE)
-        {
-            g_WButtonPressed = false;
-        }
-    }
-
-    if (key == GLFW_KEY_A)
-    {
-        if (action == GLFW_PRESS)
-        {
-            g_AButtonPressed = true;
-        }
-        else if (action == GLFW_RELEASE)
-        {
-            g_AButtonPressed = false;
-        }
-    }
+    // TECLAS W/S/D/A
+        if (key == GLFW_KEY_W)
+        pressedW = (action == GLFW_RELEASE) ? 0 : 1;
 
     if (key == GLFW_KEY_S)
-    {
+        pressedS = (action == GLFW_RELEASE) ? 0 : 1;
 
-        if (action == GLFW_PRESS)
-        {
-            g_SButtonPressed = true;
-        }
-        else if (action == GLFW_RELEASE)
-        {
-            g_SButtonPressed = false;
-        }
-    }
+    if (key == GLFW_KEY_A)
+        pressedA = (action == GLFW_RELEASE) ? 0 : 1;
 
     if (key == GLFW_KEY_D)
-    {
-        if (action == GLFW_PRESS)
-        {
-            g_DButtonPressed = true;
-        }
-        else if (action == GLFW_RELEASE)
-        {
-            g_DButtonPressed = false;
-        }
-    }
+        pressedD = (action == GLFW_RELEASE) ? 0 : 1;
 }
 
 // Definimos o callback para impressão de erros da GLFW no terminal
@@ -1276,4 +1272,5 @@ void TextRendering_ShowFramesPerSecond(GLFWwindow* window)
 }
 
 // set makeprg=cd\ ..\ &&\ make\ run\ >/dev/null
-// vim: set spell spelllang
+// vim: set spell spelllang=pt_br :
+
