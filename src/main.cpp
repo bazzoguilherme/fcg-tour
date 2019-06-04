@@ -7,6 +7,8 @@
 //
 //                   LABORATÓRIO 2
 //
+//      Alunos: Bernardo Hummes
+//              Guilherme Bazzo
 
 // Arquivos "headers" padrões de C podem ser incluídos em um
 // programa C++, sendo necessário somente adicionar o caractere
