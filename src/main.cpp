@@ -158,7 +158,7 @@ int main()
     // Criamos uma janela do sistema operacional, com 800 colunas e 800 linhas
     // de pixels, e com título "INF01047 ...".
     GLFWwindow* window;
-    window = glfwCreateWindow(800, 800, "INF01047 - 00287687 - Guilherme Torresan Bazzo", NULL, NULL);
+    window = glfwCreateWindow(800, 800, "INF01047 - FGC TOUR", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -198,7 +198,7 @@ int main()
     printf("GPU: %s, %s, OpenGL %s, GLSL %s\n", vendor, renderer, glversion, glslversion);
 
     // Carregamos os shaders de vértices e de fragmentos que serão utilizados
-    // para renderização. Veja slides 217-219 do documento "Aula_03_Rendering_Pipeline_Grafico.pdf".
+    // para renderização.
     //
     // Note que o caminho para os arquivos "shader_vertex.glsl" e
     // "shader_fragment.glsl" estão fixados, sendo que assumimos a existência
@@ -249,17 +249,17 @@ int main()
     glm::mat4 the_model;
     glm::mat4 the_view;
 
+    // Valor inicial do tempo
+    double time_prev = glfwGetTime();
+    double time_now;
+    double movimento;
+
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
         // Aqui executamos as operações de renderização
 
-        // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
-        // definida como coeficientes RGBA: Red, Green, Blue, Alpha; isto é:
-        // Vermelho, Verde, Azul, Alpha (valor de transparência).
-        // Conversaremos sobre sistemas de cores nas aulas de Modelos de Iluminação.
-        //
-        //           R     G     B     A
+        // Definimos a cor do "fundo" do framebuffer como branco.
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         // "Pintamos" todos os pixels do framebuffer com a cor definida acima,
@@ -293,7 +293,10 @@ int main()
         float x = r*cos_g_CameraPhi*sin_g_CameraTheta;
 
         // Constante de movimento para reposicionamento da câmera com WASD keys
-        float movimento = 0.02f;
+        //float movimento = 0.02f;
+        time_now = glfwGetTime();
+        movimento = time_now - time_prev;
+        time_prev = time_now;
 
         // Caso o usuário esteja caminhando pela cena virtual, alguma flag de "tecla
         // pressionada" estará ativada (ver função KeyCallback). Para as ativas,
