@@ -1824,7 +1824,7 @@
 	<inttypes.h>
 	<stdint.h>
 
-1559673194 source:c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\src\main.cpp
+1559673577 source:c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\src\main.cpp
 	<cmath>
 	<cstdio>
 	<cstdlib>
@@ -2679,7 +2679,7 @@
 1559399129 c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\include\utils.h
 	<cstdio>
 
-1559399129 c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\include\matrices.h
+1554894096 c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\include\matrices.h
 	<cstdio>
 	<cstdlib>
 	<glm/mat4x4.hpp>
