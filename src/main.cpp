@@ -129,6 +129,11 @@ bool g_UsePerspectiveProjection = true;
 // Variável que controla se o texto informativo será mostrado na tela.
 bool g_ShowInfoText = true;
 
+float CameraDistance_save = g_CameraDistance;
+float CameraPhi_FC_save = g_CameraPhi;
+float CameraTheta_FC_save = g_CameraTheta;
+
+
 // Tipo de camera atual
 // Free Camera : 1
 // Look-at-Camera : 2
@@ -265,8 +270,15 @@ int main()
     {
         // Aqui executamos as operações de renderização
 
+
+        // Constante de movimento para reposicionamento da câmera com WASD keys
+        time_now = glfwGetTime();
+        movimento = time_now - time_prev;
+        time_prev = time_now;
+
+
         // Definimos a cor do "fundo" do framebuffer como branco.
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
         // "Pintamos" todos os pixels do framebuffer com a cor definida acima,
         // e também resetamos todos os pixels do Z-buffer (depth buffer).
@@ -298,12 +310,6 @@ int main()
         float z = r*cos_g_CameraPhi*cos_g_CameraTheta;
         float x = r*cos_g_CameraPhi*sin_g_CameraTheta;
 
-        // Constante de movimento para reposicionamento da câmera com WASD keys
-        //float movimento = 0.02f;
-        time_now = glfwGetTime();
-        movimento = time_now - time_prev;
-        time_prev = time_now;
-
         // Caso o usuário esteja caminhando pela cena virtual, alguma flag de "tecla
         // pressionada" estará ativada (ver função KeyCallback). Para as ativas,
         // atualiza as coordenadas globais X Y Z da posição da câmera, decompondo,
@@ -317,6 +323,10 @@ int main()
 
         // FREE CAMERA
         if(camera_ID == 1){
+
+            CameraDistance_save = g_CameraDistance;
+            CameraPhi_FC_save = g_CameraPhi;
+            CameraTheta_FC_save = g_CameraTheta;
 
             if (pressedW)
             {
@@ -347,6 +357,7 @@ int main()
             camera_position_c  = glm::vec4(g_CamDistanceX,g_CamDistanceY,g_CamDistanceZ,1.0f);
             camera_view_vector = glm::vec4(-x, -y, -z, 0.0);
 
+        // LOOK AT CAMERA
         } else {
 
             camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
@@ -584,6 +595,7 @@ int main()
     // Fim do programa
     return 0;
 }
+
 
 // Constrói triângulos para futura renderização
 GLuint BuildTriangles()
@@ -1102,6 +1114,9 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     if (key == GLFW_KEY_1 && action == GLFW_PRESS){
         camera_ID = 1;
+        g_CameraDistance = CameraDistance_save;
+        g_CameraPhi = CameraPhi_FC_save;
+        g_CameraTheta = CameraTheta_FC_save;
     }
     if (key == GLFW_KEY_2 && action == GLFW_PRESS){
         camera_ID = 2;
