@@ -83,10 +83,17 @@ void main()
         //   constante M_PI
         //   variável position_model
 
-        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
+        vec4 c = (bbox_min + bbox_max) / 2.0;
 
-        U = 0.0;
-        V = 0.0;
+        vec4 p_line = c + normalize(position_model - c);
+
+        vec4 p_vec = p_line - c;
+
+        float theta = atan(p_vec.x, p_vec.z);
+        float phi = asin(p_vec.y);
+
+        U = (theta+M_PI)/(2*M_PI);
+        V = (phi + (M_PI/2))/M_PI;
     }
     else if ( object_id == BUNNY )
     {
@@ -108,8 +115,8 @@ void main()
         float minz = bbox_min.z;
         float maxz = bbox_max.z;
 
-        U = 0.0;
-        V = 0.0;
+        //U = 0.0;
+        //V = 0.0;
     }
     else if ( object_id == PLANE )
     {
@@ -119,8 +126,12 @@ void main()
     }
 
     // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-    vec3 Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
-
+    vec3 Kd0;
+    if ( object_id == BUNNY ){
+        Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
+    } else {
+        Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
+    }
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
 
@@ -129,5 +140,5 @@ void main()
     // Cor final com correção gamma, considerando monitor sRGB.
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
     color = pow(color, vec3(1.0,1.0,1.0)/2.2);
-} 
+}
 

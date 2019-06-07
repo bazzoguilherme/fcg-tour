@@ -293,6 +293,7 @@ int main(int argc, char* argv[])
     // Carregamos duas imagens para serem utilizadas como textura
     LoadTextureImage("../../data/tc-earth_daymap_surface.jpg");      // TextureImage0
     LoadTextureImage("../../data/tc-earth_nightmap_citylights.gif"); // TextureImage1
+    LoadTextureImage("../../data/top_donut.png"); // TextureImage2
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../data/sphere.obj");
@@ -303,13 +304,14 @@ int main(int argc, char* argv[])
     //ComputeNormals(&bunnymodel);
     //BuildTrianglesAndAddToVirtualScene(&bunnymodel)
 
-    ObjModel bunnymodel("../../data/donut.obj");
+    ObjModel bunnymodel("../../data/donut_1.obj");
     ComputeNormals(&bunnymodel);
     BuildTrianglesAndAddToVirtualScene(&bunnymodel);
 
     ObjModel planemodel("../../data/plane.obj");
     ComputeNormals(&planemodel);
     BuildTrianglesAndAddToVirtualScene(&planemodel);
+
 
     if ( argc > 1 )
     {
