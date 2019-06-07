@@ -293,7 +293,7 @@ int main(int argc, char* argv[])
     // Carregamos duas imagens para serem utilizadas como textura
     LoadTextureImage("../../data/tc-earth_daymap_surface.jpg");      // TextureImage0
     LoadTextureImage("../../data/tc-earth_nightmap_citylights.gif"); // TextureImage1
-    LoadTextureImage("../../data/top_donut.png"); // TextureImage2
+    LoadTextureImage("../../data/mug_texture.png"); // TextureImage2
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel spheremodel("../../data/sphere.obj");
@@ -304,7 +304,7 @@ int main(int argc, char* argv[])
     //ComputeNormals(&bunnymodel);
     //BuildTrianglesAndAddToVirtualScene(&bunnymodel)
 
-    ObjModel bunnymodel("../../data/donut_1.obj");
+    ObjModel bunnymodel("../../data/mug.obj");
     ComputeNormals(&bunnymodel);
     BuildTrianglesAndAddToVirtualScene(&bunnymodel);
 
@@ -491,7 +491,7 @@ int main(int argc, char* argv[])
 
         // Desenhamos o modelo do coelho
         model = Matrix_Translate(1.0f,0.0f,0.0f)
-                * Matrix_Scale(0.5f, 0.5f, 0.5f)
+                * Matrix_Scale(0.1f, 0.1f, 0.1f)
                 * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, BUNNY);

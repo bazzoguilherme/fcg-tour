@@ -115,8 +115,8 @@ void main()
         float minz = bbox_min.z;
         float maxz = bbox_max.z;
 
-        //U = 0.0;
-        //V = 0.0;
+        U = texcoords.x;
+        V = texcoords.y;
     }
     else if ( object_id == PLANE )
     {
@@ -127,15 +127,21 @@ void main()
 
     // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
     vec3 Kd0;
+    vec3 Kd1;
+
     if ( object_id == BUNNY ){
         Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
     } else {
-        Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
+        Kd0 = texture(TextureImage0, vec2(U,V)).rgb ;
     }
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
 
-    color = Kd0 * (lambert + 0.01);
+    if (object_id == SPHERE) {
+        Kd1 = texture(TextureImage1, vec2(U,V)).rgb;
+    }
+
+    color = Kd0 * (lambert + 0.01) + Kd1*(1-pow(lambert, 0.2));
 
     // Cor final com correção gamma, considerando monitor sRGB.
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
