@@ -246,7 +246,7 @@ int main(int argc, char* argv[])
     // Criamos uma janela do sistema operacional, com 800 colunas e 600 linhas
     // de pixels, e com título "INF01047 ...".
     GLFWwindow* window;
-    window = glfwCreateWindow(800, 600, "INF01047 - Seu Cartao - Seu Nome", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "INF01047 - FCG - TOUR", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -299,7 +299,11 @@ int main(int argc, char* argv[])
     ComputeNormals(&spheremodel);
     BuildTrianglesAndAddToVirtualScene(&spheremodel);
 
-    ObjModel bunnymodel("../../data/bunny.obj");
+    //ObjModel bunnymodel("../../data/bunny.obj");
+    //ComputeNormals(&bunnymodel);
+    //BuildTrianglesAndAddToVirtualScene(&bunnymodel)
+
+    ObjModel bunnymodel("../../data/donut.obj");
     ComputeNormals(&bunnymodel);
     BuildTrianglesAndAddToVirtualScene(&bunnymodel);
 
@@ -485,7 +489,8 @@ int main(int argc, char* argv[])
 
         // Desenhamos o modelo do coelho
         model = Matrix_Translate(1.0f,0.0f,0.0f)
-              * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
+                * Matrix_Scale(0.5f, 0.5f, 0.5f)
+                * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, BUNNY);
         DrawVirtualObject("bunny");

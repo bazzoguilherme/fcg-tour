@@ -24,10 +24,10 @@
 	<inttypes.h>
 	<stdint.h>
 
-1559044482 source:c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\src\stb_image.cpp
+1559796594 source:c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\src\stb_image.cpp
 	"stb_image.h"
 
-1559044482 c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\include\stb_image.h
+1559796594 c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\include\stb_image.h
 	"stb_image.h"
 	<stdio.h>
 	<stdarg.h>
@@ -43,7 +43,7 @@
 	<intrin.h>
 	<arm_neon.h>
 
-1559044482 source:c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\src\textrendering.cpp
+1559796594 source:c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\src\textrendering.cpp
 	<string>
 	<glad/glad.h>
 	<GLFW/glfw3.h>
@@ -635,10 +635,10 @@
 	<stddef.h>
 	<stdint.h>
 
-1559044482 source:c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\src\tiny_obj_loader.cpp
+1559796594 source:c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\src\tiny_obj_loader.cpp
 	"tiny_obj_loader.h"
 
-1559044482 c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\include\tiny_obj_loader.h
+1559796594 c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\include\tiny_obj_loader.h
 	<map>
 	<string>
 	<vector>
