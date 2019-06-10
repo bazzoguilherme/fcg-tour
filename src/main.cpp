@@ -168,9 +168,9 @@ bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mous
 // usuário através do mouse (veja função CursorPosCallback()). A posição
 // efetiva da câmera é calculada dentro da função main(), dentro do loop de
 // renderização.
-float g_CameraTheta = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
-float g_CameraPhi = 0.0f;   // Ângulo em relação ao eixo Y
-float g_CameraDistance = 3.5f; // Distância da câmera para a origem
+float g_CameraTheta = 1.58f; // Ângulo no plano ZX em relação ao eixo Z
+float g_CameraPhi = 0.2f;   // Ângulo em relação ao eixo Y
+float g_CameraDistance = 3.0f; // Distância da câmera para a origem
 
 // Variáveis que salvarão o estado atual da FREE CAMERA, assim, caso mudemos
 // para a LOOK_AT_CAMERA podemos voltar para onde estávamos no espaço com o
@@ -434,7 +434,7 @@ int main(int argc, char* argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 190-193 do documento "Aula_09_Projecoes.pdf".
         float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -20.0f; // Posição do "far plane"
+        float farplane  = -30.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
@@ -465,57 +465,11 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(view_uniform       , 1 , GL_FALSE , glm::value_ptr(view));
         glUniformMatrix4fv(projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
 
-        //#define CHAO 0
-        //#define PAREDE 1
-        //#define TETO 2
-        //#define ESTANDE 3
+
         #define MUSEU 0
-        /*
-        // Desenhamos o modelo do chao
-        model = Matrix_Translate(0.0f, -2.0f, 0.0f)
-              * Matrix_Scale(4.0f, 1.0f, 5.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, CHAO);
-        DrawVirtualObject("chao");
 
-
-        // Desenhamos o modelo da parede
-        model = Matrix_Translate(0.0f, -2.0f, 0.0f)
-              * Matrix_Scale(0.005f, 0.005f, 0.005f)
-              * Matrix_Scale(1.0f, 1.5f, 3.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PAREDE);
-        DrawVirtualObject("parede");
-
-        // Desenhamos o modelo da parede
-        model = Matrix_Translate(0.0f, -2.0f, 5.0f)
-              * Matrix_Scale(0.005f, 0.005f, 0.005f)
-              * Matrix_Scale(3.0f, 1.5f, 1.0f)
-              * Matrix_Rotate_Y(M_PI/2.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PAREDE);
-        DrawVirtualObject("parede");
-
-        // Desenhamos o modelo da parede
-        model = Matrix_Translate(0.0f, -2.0f, -5.0f)
-              * Matrix_Scale(0.005f, 0.005f, 0.005f)
-              * Matrix_Scale(3.0f, 1.5f, 1.0f)
-              * Matrix_Rotate_Y(-M_PI/2.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PAREDE);
-        DrawVirtualObject("parede");
-
-        // Desenhamos o modelo da parede
-        model = Matrix_Translate(0.0f, -2.0f, 0.0f)
-              * Matrix_Scale(0.005f, 0.005f, 0.005f)
-              * Matrix_Scale(1.0f, 1.5f, 3.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PAREDE);
-        DrawVirtualObject("parede");
-        */
-
-        model = Matrix_Translate(0.0f, 1.0f, 0.0f)
-              * Matrix_Scale(3.0f, 2.5f, 3.0f);
+        model = Matrix_Translate(-10.0f, 1.0f, 0.0f)
+              * Matrix_Scale(15.0f, 6.0f, 12.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, MUSEU);
         DrawVirtualObject("museu");
