@@ -53,7 +53,7 @@ void main()
     vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
     vec4 camera_position = inverse(view) * origin;
 
-    vec4 spotlightPosition = vec4(-10.0,2.5,0.0,1.0);
+    vec4 spotlightPosition = vec4(-22.0,4,0.0,1.0);
     vec4 spotlightDirection = vec4(0.0,-1.0,0.0,0.0);
 
     // O fragmento atual é coberto por um ponto que percente à superfície de um
