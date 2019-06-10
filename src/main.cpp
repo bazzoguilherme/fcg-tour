@@ -491,49 +491,7 @@ int main(int argc, char* argv[])
             glUniform1i(object_id_uniform, ESTANDE);
             DrawVirtualObject("estande");
         }
-        /*
-        model = Matrix_Translate(-2.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
 
-        model = Matrix_Translate(-6.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
-
-        model = Matrix_Translate(-10.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
-
-        model = Matrix_Translate(-14.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
-
-        model = Matrix_Translate(-18.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
-
-        model = Matrix_Translate(-22.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
-
-        model = Matrix_Translate(-26.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
-        */
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
         // matrizes the_model, the_view, e the_projection; e escrevemos na tela
