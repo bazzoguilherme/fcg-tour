@@ -20,7 +20,7 @@ uniform mat4 projection;
 
 // Identificador que define qual objeto está sendo desenhado no momento
 #define MUSEU 0
-#define PAREDE 1
+#define ESTANDE 1
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -34,6 +34,7 @@ uniform sampler2D TextureImage2;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
+vec3 lambert_color;
 
 // Parâmetros que definem as propriedades espectrais da superfície
 vec3 Kd; // Refletância difusa
@@ -52,7 +53,7 @@ void main()
     vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
     vec4 camera_position = inverse(view) * origin;
 
-    vec4 spotlightPosition = vec4(0.0,2.5,0.0,1.0);
+    vec4 spotlightPosition = vec4(-10.0,2.5,0.0,1.0);
     vec4 spotlightDirection = vec4(0.0,-1.0,0.0,0.0);
 
     // O fragmento atual é coberto por um ponto que percente à superfície de um
@@ -87,26 +88,32 @@ void main()
     {
         U = texcoords.x;
         V = texcoords.y;
-        Kd0 = texture(TextureImage0, vec2(U,V)).rgb ;
+        Kd = texture(TextureImage0, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        Kd = vec3(0.640000, 0.640000, 0.640000);
+        //Kd = vec3(0.640000, 0.640000, 0.640000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
-        q = 1.0;
+        q = 20.0;
 
-    } else if ( object_id == PAREDE )
+    } else if ( object_id == ESTANDE )
     {
         U = texcoords.x;
         V = texcoords.y;
-        Kd0 = texture(TextureImage1, vec2(U,V)).rgb ;
+        Kd = texture(TextureImage1, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        //Kd = vec3(0.640000, 0.640000, 0.640000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+
     }
 
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
 
-    color = Kd0 * (lambert + 0.01);
+    lambert_color = Kd * (lambert + 0.01);
 
-    /*
+
     // Espectro da fonte de iluminação
     vec3 I = vec3(1.0, 1.0, 1.0);
 
@@ -123,11 +130,11 @@ void main()
     vec3 phong_specular_term  = Ks*I*pow(max(0.0, dot(r,v)),q);
 
     // Cor final do fragmento calculada com uma combinação dos termos difuso, especular, e ambiente.
-    if(dot((normalize(p - spotlightPosition)), normalize(spotlightDirection)) < cos(M_PI/9)) //60 graus
-        color = ambient_term;
+    if(dot((normalize(p - spotlightPosition)), normalize(spotlightDirection)) < cos(M_PI/2.5)) //60 graus
+        color = lambert_color;
     else
-        color = lambert_diffuse_term + ambient_term + phong_specular_term;
-    */
+        color = lambert_diffuse_term + ambient_term + phong_specular_term ;
+
 
 
     // Cor final com correção gamma, considerando monitor sRGB.

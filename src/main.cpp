@@ -285,7 +285,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu"};//"chao", "parede", "estande"};
+    std::vector<const char*> object_names = {"museu", "estande"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -467,12 +467,19 @@ int main(int argc, char* argv[])
 
 
         #define MUSEU 0
+        #define ESTANDE 1
 
         model = Matrix_Translate(-10.0f, 1.0f, 0.0f)
               * Matrix_Scale(15.0f, 6.0f, 12.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, MUSEU);
         DrawVirtualObject("museu");
+
+        model = Matrix_Translate(0.0f, -5.0f, -11.0f)
+              * Matrix_Scale(0.85f, 1.2f, 0.85f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, ESTANDE);
+        DrawVirtualObject("estande");
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
