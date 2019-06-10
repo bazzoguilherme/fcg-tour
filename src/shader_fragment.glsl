@@ -19,9 +19,8 @@ uniform mat4 view;
 uniform mat4 projection;
 
 // Identificador que define qual objeto está sendo desenhado no momento
-#define SPHERE 0
-#define BUNNY  1
-#define PLANE  2
+#define MUSEU 0
+#define PAREDE 1
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -36,6 +35,12 @@ uniform sampler2D TextureImage2;
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
 
+// Parâmetros que definem as propriedades espectrais da superfície
+vec3 Kd; // Refletância difusa
+vec3 Ks; // Refletância especular
+vec3 Ka; // Refletância ambiente
+float q; // Expoente especular para o modelo de iluminação de Phong
+
 // Constantes
 #define M_PI   3.14159265358979323846
 #define M_PI_2 1.57079632679489661923
@@ -46,6 +51,9 @@ void main()
     // sistema de coordenadas da câmera.
     vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
     vec4 camera_position = inverse(view) * origin;
+
+    vec4 spotlightPosition = vec4(0.0,2.5,0.0,1.0);
+    vec4 spotlightDirection = vec4(0.0,-1.0,0.0,0.0);
 
     // O fragmento atual é coberto por um ponto que percente à superfície de um
     // dos objetos virtuais da cena. Este ponto, p, possui uma posição no
@@ -59,71 +67,68 @@ void main()
     vec4 n = normalize(normal);
 
     // Vetor que define o sentido da fonte de luz em relação ao ponto atual.
-    vec4 l = normalize(vec4(1.0,1.0,0.0,0.0));
+    //vec4 l = normalize(vec4(1.0,1.0,0.0,0.0));
+    vec4 l = normalize(spotlightPosition - p);
 
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
+
+    // Vetor que define o sentido da reflexão especular ideal.
+    vec4 r = -l + 2*n*(dot(n, l));
 
     // Coordenadas de textura U e V
     float U = 0.0;
     float V = 0.0;
 
-    if ( object_id == SPHERE )
-    {
-        // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
-        // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência
-        // o slide 144 do documento "Aula_20_e_21_Mapeamento_de_Texturas.pdf".
-        // A esfera que define a projeção deve estar centrada na posição
-        // "bbox_center" definida abaixo.
-
-        // Você deve utilizar:
-        //   função 'length( )' : comprimento Euclidiano de um vetor
-        //   função 'atan( , )' : arcotangente. Veja https://en.wikipedia.org/wiki/Atan2.
-        //   função 'asin( )'   : seno inverso.
-        //   constante M_PI
-        //   variável position_model
-
-        vec4 c = (bbox_min + bbox_max) / 2.0;
-
-        vec4 p_line = c + normalize(position_model - c);
-
-        vec4 p_vec = p_line - c;
-
-        float theta = atan(p_vec.x, p_vec.z);
-        float phi = asin(p_vec.y);
-
-        U = (theta+M_PI)/(2*M_PI);
-        V = (phi + (M_PI/2))/M_PI;
-    }
-    else if ( object_id == BUNNY )
-    {
-        U = texcoords.x;
-        V = texcoords.y;
-    }
-    else if ( object_id == PLANE )
-    {
-        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
-        U = texcoords.x;
-        V = texcoords.y;
-    }
-
-    // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
     vec3 Kd0;
-    vec3 Kd1;
 
-    if ( object_id == BUNNY ){
-        Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
-    } else {
+
+    if ( object_id == MUSEU )
+    {
+        U = texcoords.x;
+        V = texcoords.y;
         Kd0 = texture(TextureImage0, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        Kd = vec3(0.640000, 0.640000, 0.640000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 1.0;
+
+    } else if ( object_id == PAREDE )
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd0 = texture(TextureImage1, vec2(U,V)).rgb ;
     }
+
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
 
-    if (object_id == SPHERE) {
-        Kd1 = texture(TextureImage1, vec2(U,V)).rgb;
-    }
+    color = Kd0 * (lambert + 0.01);
 
-    color = Kd0 * (lambert + 0.01) + Kd1*(1-pow(lambert, 0.2));
+    /*
+    // Espectro da fonte de iluminação
+    vec3 I = vec3(1.0, 1.0, 1.0);
+
+    // Espectro da luz ambiente
+    vec3 Ia = vec3(0.2, 0.2, 0.2);
+
+    // Termo difuso utilizando a lei dos cossenos de Lambert
+    vec3 lambert_diffuse_term = Kd*I*max(0.0,dot(n,l));
+
+    // Termo ambiente
+    vec3 ambient_term = Ka*Ia;
+
+    // Termo especular utilizando o modelo de iluminação de Phong
+    vec3 phong_specular_term  = Ks*I*pow(max(0.0, dot(r,v)),q);
+
+    // Cor final do fragmento calculada com uma combinação dos termos difuso, especular, e ambiente.
+    if(dot((normalize(p - spotlightPosition)), normalize(spotlightDirection)) < cos(M_PI/9)) //60 graus
+        color = ambient_term;
+    else
+        color = lambert_diffuse_term + ambient_term + phong_specular_term;
+    */
+
 
     // Cor final com correção gamma, considerando monitor sRGB.
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
