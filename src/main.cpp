@@ -192,6 +192,10 @@ int pressedW =0, pressedS=0, pressedA=0, pressedD=0;
 // 2: Look-at-Camera
 int camera_view_ID = 1;
 
+#define QUANT_ESTANDE 20
+std::vector<glm::vec4> posicoes_estandes;
+int estande_atual = 0;
+
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
 
@@ -337,7 +341,7 @@ int main(int argc, char* argv[])
 
         // Controle do tempo no movimento para reposicionamento da câmera com WASD keys
         time_now = glfwGetTime();
-        passo_tempo = time_now - time_prev;
+        passo_tempo = 2*(time_now - time_prev);
         time_prev = time_now;
 
         // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
@@ -418,7 +422,8 @@ int main(int argc, char* argv[])
         } else {
 
             camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
-            camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            //camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            camera_lookat_l    = posicoes_estandes[estande_atual]; // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
         }
 
@@ -481,6 +486,8 @@ int main(int argc, char* argv[])
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, ESTANDE);
             DrawVirtualObject("estande");
+
+            posicoes_estandes.push_back(glm::vec4(-1.2f*estandes, -4.8f, -11.0f, 1.0f));
         }
 
         for (float estandes = 0; estandes<10*4; estandes+=4){
@@ -490,50 +497,10 @@ int main(int argc, char* argv[])
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, ESTANDE);
             DrawVirtualObject("estande");
+
+            posicoes_estandes.push_back(glm::vec4(-1.2f*estandes, -4.8f, 11.0f, 1.0f));
         }
-        /*
-        model = Matrix_Translate(-2.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
 
-        model = Matrix_Translate(-6.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
-
-        model = Matrix_Translate(-10.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
-
-        model = Matrix_Translate(-14.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
-
-        model = Matrix_Translate(-18.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
-
-        model = Matrix_Translate(-22.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
-
-        model = Matrix_Translate(-26.0f, -5.0f, -11.0f)
-              * Matrix_Scale(0.85f, 1.2f, 0.85f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESTANDE);
-        DrawVirtualObject("estande");
-        */
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
         // matrizes the_model, the_view, e the_projection; e escrevemos na tela
@@ -1279,7 +1246,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     //   Se apertar tecla Z       então g_AngleZ += delta;
     //   Se apertar tecla shift+Z então g_AngleZ -= delta;
 
-    float delta = 3.141592 / 16; // 22.5 graus, em radianos.
+    float delta = M_PI / 16; // 22.5 graus, em radianos.
 
     if (key == GLFW_KEY_X && action == GLFW_PRESS)
     {
@@ -1359,6 +1326,23 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     if (key == GLFW_KEY_D)
         pressedD = (action == GLFW_RELEASE) ? 0 : 1;
+
+
+    // Andar entre os estandes
+    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS && camera_view_ID==2) {
+        if ( estande_atual == QUANT_ESTANDE-1 ){
+            estande_atual = 0;
+        } else {
+            estande_atual += 1;
+        }
+    }
+    if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && camera_view_ID) {
+        if ( estande_atual == 0 ){
+            estande_atual = QUANT_ESTANDE-1;
+        } else {
+            estande_atual -= 1;
+        }
+    }
 
 }
 
