@@ -421,9 +421,10 @@ int main(int argc, char* argv[])
         // LOOK AT CAMERA
         } else {
 
-            camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
+            //camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
+            camera_position_c  = glm::vec4(-0.0f, 1.5f, 9.5f,1.0f); // Ponto "c", centro da câmera
             //camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-            camera_lookat_l    = posicoes_estandes[estande_atual]; // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.0f, posicoes_estandes[estande_atual].z, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
         }
 
