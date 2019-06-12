@@ -192,6 +192,10 @@ int pressedW =0, pressedS=0, pressedA=0, pressedD=0;
 // 2: Look-at-Camera
 int camera_view_ID = 1;
 
+float y;
+float z;
+float x;
+
 #define QUANT_ESTANDE 20
 std::vector<glm::vec4> posicoes_estandes;
 int estande_atual = 0;
@@ -341,7 +345,7 @@ int main(int argc, char* argv[])
 
         // Controle do tempo no movimento para reposicionamento da câmera com WASD keys
         time_now = glfwGetTime();
-        passo_tempo = 2*(time_now - time_prev);
+        passo_tempo = 3*(time_now - time_prev);
         time_prev = time_now;
 
         // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
@@ -373,9 +377,9 @@ int main(int argc, char* argv[])
         float cos_g_CameraTheta = cos(g_CameraTheta);
 
         // Coordenadas do view vector
-        float y = r*sin_g_CameraPhi;
-        float z = r*cos_g_CameraPhi*cos_g_CameraTheta;
-        float x = r*cos_g_CameraPhi*sin_g_CameraTheta;
+        y = r*sin_g_CameraPhi;
+        z = r*cos_g_CameraPhi*cos_g_CameraTheta;
+        x = r*cos_g_CameraPhi*sin_g_CameraTheta;
 
         glm::vec4 camera_position_c;
         glm::vec4 camera_lookat_l;
@@ -421,8 +425,8 @@ int main(int argc, char* argv[])
         // LOOK AT CAMERA
         } else {
 
-            //camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
-            camera_position_c  = glm::vec4(-0.0f, 1.5f, 9.5f,1.0f); // Ponto "c", centro da câmera
+            camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
+            //camera_position_c  = glm::vec4(-0.0f, 1.5f, 9.5f,1.0f); // Ponto "c", centro da câmera
             //camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.0f, posicoes_estandes[estande_atual].z, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
@@ -1335,6 +1339,9 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             estande_atual = 0;
         } else {
             estande_atual += 1;
+            //x = posicoes_estandes[estande_atual].x;
+            //y = posicoes_estandes[estande_atual].y;
+            //z = posicoes_estandes[estande_atual].z;
         }
     }
     if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && camera_view_ID) {
