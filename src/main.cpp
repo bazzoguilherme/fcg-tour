@@ -10,16 +10,16 @@
 //      Alunos: Bernardo Hummes
 //              Guilherme Bazzo
 //
-// Arquivos "headers" padrões de C podem ser incluídos em um
-// programa C++, sendo necessário somente adicionar o caractere
-// "c" antes de seu nome, e remover o sufixo ".h". Exemplo:
-//    #include <stdio.h> // Em C
-//  vira
-//    #include <cstdio> // Em C++
-//
+
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+
+#define WIDTH 800
+#define HEIGHT 600
+#define WINDOW_TITLE "FCG Tour"
+
+#define M_PI   3.14159265358979323846
 
 // Headers abaixo são específicos de C++
 #include <map>
@@ -53,7 +53,7 @@
 #include "matrices.h"
 
 // Estrutura que representa um modelo geométrico carregado a partir de um
-// arquivo ".obj". Veja https://en.wikipedia.org/wiki/Wavefront_.obj_file .
+// arquivo ".obj".
 struct ObjModel
 {
     tinyobj::attrib_t                 attrib;
@@ -61,13 +61,16 @@ struct ObjModel
     std::vector<tinyobj::material_t>  materials;
 
     // Este construtor lê o modelo de um arquivo utilizando a biblioteca tinyobjloader.
-    // Veja: https://github.com/syoyo/tinyobjloader
-    ObjModel(const char* filename, const char* basepath = NULL, bool triangulate = true)
+    ObjModel(const char* filename, const char* basepath = "../../data/", bool triangulate = true)
     {
         printf("Carregando modelo \"%s\"... ", filename);
 
+        char filepath[100];
+        strcpy(filepath, filename);
+        strcat(filepath, ".obj");
+
         std::string err;
-        bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, filename, basepath, triangulate);
+        bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, filepath, basepath, triangulate);
 
         if (!err.empty())
             fprintf(stderr, "\n%s\n", err.c_str());
@@ -167,9 +170,9 @@ bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mous
 // usuário através do mouse (veja função CursorPosCallback()). A posição
 // efetiva da câmera é calculada dentro da função main(), dentro do loop de
 // renderização.
-float g_CameraTheta = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
-float g_CameraPhi = 0.0f;   // Ângulo em relação ao eixo Y
-float g_CameraDistance = 3.5f; // Distância da câmera para a origem
+float g_CameraTheta = 1.58f; // Ângulo no plano ZX em relação ao eixo Z
+float g_CameraPhi = 0.2f;   // Ângulo em relação ao eixo Y
+float g_CameraDistance = 3.0f; // Distância da câmera para a origem
 
 // Variáveis que salvarão o estado atual da FREE CAMERA, assim, caso mudemos
 // para a LOOK_AT_CAMERA podemos voltar para onde estávamos no espaço com o
@@ -179,25 +182,21 @@ float CameraPhi_FC_save = g_CameraPhi;
 float CameraTheta_FC_save = g_CameraTheta;
 
 // Inicializa distância da câmera ao ponto (0,0,0) global
-float g_CamDistanceX = 0.0f;
-float g_CamDistanceY = 0.0f;
-float g_CamDistanceZ = 2.5f;
+float g_CamDistanceX = -1.0f;
+float g_CamDistanceY = 1.0f;
+float g_CamDistanceZ = 0.0f;
 
 // flags para teclas walkaround
 int pressedW =0, pressedS=0, pressedA=0, pressedD=0;
 
-// Tipo de camera atual
-// Free Camera : 1
-// Look-at-Camera : 2
-int camera_ID = 1;
+// Tipo de camera
+// 1: Free Camera
+// 2: Look-at-Camera
+int camera_view_ID = 1;
 
-// Variáveis que controlam rotação do antebraço
-float g_ForearmAngleZ = 0.0f;
-float g_ForearmAngleX = 0.0f;
-
-// Variáveis que controlam translação do torso
-float g_TorsoPositionX = 0.0f;
-float g_TorsoPositionY = 0.0f;
+#define QUANT_ESTANDE 20
+std::vector<glm::vec4> posicoes_estandes;
+int estande_atual = 0;
 
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
@@ -248,7 +247,7 @@ int main(int argc, char* argv[])
     // Criamos uma janela do sistema operacional, com 800 colunas e 600 linhas
     // de pixels, e com título "INF01047 ...".
     GLFWwindow* window;
-    window = glfwCreateWindow(800, 600, "INF01047 - FCG - TOUR", NULL, NULL);
+    window = glfwCreateWindow(WIDTH, HEIGHT, WINDOW_TITLE, NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -292,28 +291,22 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    // Carregamos duas imagens para serem utilizadas como textura
-    LoadTextureImage("../../data/tc-earth_daymap_surface.jpg");      // TextureImage0
-    LoadTextureImage("../../data/tc-earth_nightmap_citylights.gif"); // TextureImage1
-    LoadTextureImage("../../data/mug_texture.png"); // TextureImage2
+    std::vector<const char*> object_names = {"museu", "estande"};
+    std::vector<const char*>::iterator iterator_obj_names ;
 
-    // Construímos a representação de objetos geométricos através de malhas de triângulos
-    ObjModel spheremodel("../../data/sphere.obj");
-    ComputeNormals(&spheremodel);
-    BuildTrianglesAndAddToVirtualScene(&spheremodel);
+    const char* basepath = "../../data/";
 
-    //ObjModel bunnymodel("../../data/bunny.obj");
-    //ComputeNormals(&bunnymodel);
-    //BuildTrianglesAndAddToVirtualScene(&bunnymodel)
+    for (iterator_obj_names = object_names.begin(); iterator_obj_names != object_names.end(); iterator_obj_names++){
+        char filepath[100];
+        strcpy(filepath, basepath);
+        strcat(filepath, *iterator_obj_names);
 
-    ObjModel bunnymodel("../../data/mug.obj");
-    ComputeNormals(&bunnymodel);
-    BuildTrianglesAndAddToVirtualScene(&bunnymodel);
+        LoadTextureImage(filepath);
 
-    ObjModel planemodel("../../data/plane.obj");
-    ComputeNormals(&planemodel);
-    BuildTrianglesAndAddToVirtualScene(&planemodel);
-
+        ObjModel obj_model(filepath, basepath);
+        ComputeNormals(&obj_model);
+        BuildTrianglesAndAddToVirtualScene(&obj_model);
+    }
 
     if ( argc > 1 )
     {
@@ -341,7 +334,7 @@ int main(int argc, char* argv[])
     // Valor inicial do tempo
     double time_prev = glfwGetTime();
     double time_now;
-    double movimento;
+    double passo_tempo;
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -350,7 +343,7 @@ int main(int argc, char* argv[])
 
         // Controle do tempo no movimento para reposicionamento da câmera com WASD keys
         time_now = glfwGetTime();
-        movimento = time_now - time_prev;
+        passo_tempo = 2*(time_now - time_prev);
         time_prev = time_now;
 
         // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
@@ -394,7 +387,7 @@ int main(int argc, char* argv[])
         glm::vec4 camera_up_vector;
 
         // FREE CAMERA
-        if(camera_ID == 1){
+        if(camera_view_ID == 1){
 
             CameraDistance_save = g_CameraDistance;
             CameraPhi_FC_save = g_CameraPhi;
@@ -402,28 +395,28 @@ int main(int argc, char* argv[])
 
             if (pressedW)
             {
-                g_CamDistanceY -= (movimento*sin_g_CameraPhi);
-                g_CamDistanceZ -= (movimento*cos_g_CameraPhi * cos_g_CameraTheta);
-                g_CamDistanceX -= (movimento*cos_g_CameraPhi * sin_g_CameraTheta);
+                //g_CamDistanceY -= (passo_tempo*sin_g_CameraPhi);
+                g_CamDistanceZ -= (passo_tempo * cos_g_CameraTheta);
+                g_CamDistanceX -= (passo_tempo * sin_g_CameraTheta);
             }
 
             if (pressedS)
             {
-                g_CamDistanceY += (movimento*sin_g_CameraPhi);
-                g_CamDistanceZ += (movimento*cos_g_CameraPhi * cos_g_CameraTheta);
-                g_CamDistanceX += (movimento*cos_g_CameraPhi * sin_g_CameraTheta);
+                //g_CamDistanceY += (passo_tempo*sin_g_CameraPhi);
+                g_CamDistanceZ += (passo_tempo * cos_g_CameraTheta);
+                g_CamDistanceX += (passo_tempo * sin_g_CameraTheta);
             }
 
             if (pressedA)
             {
-                g_CamDistanceX -= (movimento*cos_g_CameraPhi * cos_g_CameraTheta);
-                g_CamDistanceZ += (movimento*cos_g_CameraPhi * sin_g_CameraTheta);
+                g_CamDistanceX -= (passo_tempo * cos_g_CameraTheta);
+                g_CamDistanceZ += (passo_tempo * sin_g_CameraTheta);
             }
 
             if (pressedD)
             {
-                g_CamDistanceX += (movimento*cos_g_CameraPhi * cos_g_CameraTheta);
-                g_CamDistanceZ -= (movimento*cos_g_CameraPhi * sin_g_CameraTheta);
+                g_CamDistanceX += (passo_tempo * cos_g_CameraTheta);
+                g_CamDistanceZ -= (passo_tempo * sin_g_CameraTheta);
             }
 
             camera_position_c  = glm::vec4(g_CamDistanceX,g_CamDistanceY,g_CamDistanceZ,1.0f);
@@ -432,8 +425,10 @@ int main(int argc, char* argv[])
         // LOOK AT CAMERA
         } else {
 
-            camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
-            camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            //camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
+            camera_position_c  = glm::vec4(-0.0f, 1.5f, 9.5f,1.0f); // Ponto "c", centro da câmera
+            //camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.0f, posicoes_estandes[estande_atual].z, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
         }
 
@@ -449,13 +444,13 @@ int main(int argc, char* argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 190-193 do documento "Aula_09_Projecoes.pdf".
         float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -10.0f; // Posição do "far plane"
+        float farplane  = -60.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
             // Projeção Perspectiva.
             // Para definição do field of view (FOV), veja slide 227 do documento "Aula_09_Projecoes.pdf".
-            float field_of_view = 3.141592 / 3.0f;
+            float field_of_view = M_PI / 3.0f;
             projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
         }
         else
@@ -480,32 +475,36 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(view_uniform       , 1 , GL_FALSE , glm::value_ptr(view));
         glUniformMatrix4fv(projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
 
-        #define SPHERE 0
-        #define BUNNY  1
-        #define PLANE  2
 
-        // Desenhamos o modelo da esfera
-        model = Matrix_Translate(-1.0f,0.0f,0.0f)
-              * Matrix_Rotate_Z(0.6f)
-              * Matrix_Rotate_X(0.2f)
-              * Matrix_Rotate_Y(g_AngleY + (float)glfwGetTime() * 0.1f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, SPHERE);
-        DrawVirtualObject("sphere");
+        #define MUSEU 0
+        #define ESTANDE 1
 
-        // Desenhamos o modelo do coelho
-        model = Matrix_Translate(1.0f,0.0f,0.0f)
-                * Matrix_Scale(0.1f, 0.1f, 0.1f)
-                * Matrix_Rotate_X(g_AngleX + (float)glfwGetTime() * 0.1f);
+        model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
+              * Matrix_Scale(25.0f, 6.0f, 12.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, BUNNY);
-        DrawVirtualObject("bunny");
+        glUniform1i(object_id_uniform, MUSEU);
+        DrawVirtualObject("museu");
 
-        // Desenhamos o plano do chão
-        model = Matrix_Translate(0.0f,-1.1f,0.0f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, PLANE);
-        DrawVirtualObject("plane");
+        for (float estandes = 0; estandes<10*4; estandes+=4){
+            model = Matrix_Translate(-1.2f*estandes, -4.8f, -11.0f)
+                  * Matrix_Scale(0.95f, 1.2f, 0.95f);
+            glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(object_id_uniform, ESTANDE);
+            DrawVirtualObject("estande");
+
+            posicoes_estandes.push_back(glm::vec4(-1.2f*estandes, -4.8f, -11.0f, 1.0f));
+        }
+
+        for (float estandes = 0; estandes<10*4; estandes+=4){
+            model = Matrix_Translate(-1.2f*estandes, -4.8f, 11.0f)
+                  * Matrix_Scale(0.95f, 1.2f, 0.95f)
+                  * Matrix_Rotate_Y(M_PI);
+            glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(object_id_uniform, ESTANDE);
+            DrawVirtualObject("estande");
+
+            posicoes_estandes.push_back(glm::vec4(-1.2f*estandes, -4.8f, 11.0f, 1.0f));
+        }
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
@@ -550,18 +549,22 @@ int main(int argc, char* argv[])
 // Função que carrega uma imagem para ser utilizada como textura
 void LoadTextureImage(const char* filename)
 {
-    printf("Carregando imagem \"%s\"... ", filename);
+    char filepath[100];
+    strcpy(filepath, filename);
+    strcat(filepath, ".png");
+
+    printf("Carregando imagem \"%s\"... ", filepath);
 
     // Primeiro fazemos a leitura da imagem do disco
     stbi_set_flip_vertically_on_load(true);
     int width;
     int height;
     int channels;
-    unsigned char *data = stbi_load(filename, &width, &height, &channels, 3);
+    unsigned char *data = stbi_load(filepath, &width, &height, &channels, 3);
 
     if ( data == NULL )
     {
-        fprintf(stderr, "ERROR: Cannot open image file \"%s\".\n", filename);
+        fprintf(stderr, "ERROR: Cannot open image file \"%s\".\n", filepath);
         std::exit(EXIT_FAILURE);
     }
 
@@ -1181,8 +1184,8 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         float dy = ypos - g_LastCursorPosY;
 
         // Atualizamos parâmetros da antebraço com os deslocamentos
-        g_ForearmAngleZ -= 0.01f*dx;
-        g_ForearmAngleX += 0.01f*dy;
+        //g_ForearmAngleZ -= 0.01f*dx;
+        //g_ForearmAngleX += 0.01f*dy;
 
         // Atualizamos as variáveis globais para armazenar a posição atual do
         // cursor como sendo a última posição conhecida do cursor.
@@ -1197,13 +1200,13 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         float dy = ypos - g_LastCursorPosY;
 
         // Atualizamos parâmetros da antebraço com os deslocamentos
-        g_TorsoPositionX += 0.01f*dx;
-        g_TorsoPositionY -= 0.01f*dy;
+        //g_TorsoPositionX += 0.01f*dx;
+        //g_TorsoPositionY -= 0.01f*dy;
 
         // Atualizamos as variáveis globais para armazenar a posição atual do
         // cursor como sendo a última posição conhecida do cursor.
-        g_LastCursorPosX = xpos;
-        g_LastCursorPosY = ypos;
+        //g_LastCursorPosX = xpos;
+        //g_LastCursorPosY = ypos;
     }
 }
 
@@ -1248,7 +1251,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     //   Se apertar tecla Z       então g_AngleZ += delta;
     //   Se apertar tecla shift+Z então g_AngleZ -= delta;
 
-    float delta = 3.141592 / 16; // 22.5 graus, em radianos.
+    float delta = M_PI / 16; // 22.5 graus, em radianos.
 
     if (key == GLFW_KEY_X && action == GLFW_PRESS)
     {
@@ -1270,10 +1273,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         g_AngleX = 0.0f;
         g_AngleY = 0.0f;
         g_AngleZ = 0.0f;
-        g_ForearmAngleX = 0.0f;
-        g_ForearmAngleZ = 0.0f;
-        g_TorsoPositionX = 0.0f;
-        g_TorsoPositionY = 0.0f;
+        //g_ForearmAngleX = 0.0f;
+        //g_ForearmAngleZ = 0.0f;
+        //g_TorsoPositionX = 0.0f;
+        //g_TorsoPositionY = 0.0f;
     }
 
     // Se o usuário apertar a tecla P, utilizamos projeção perspectiva.
@@ -1306,13 +1309,13 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     // Atual controle sobre qual camera usar
     if (key == GLFW_KEY_1 && action == GLFW_PRESS){
-        camera_ID = 1;
+        camera_view_ID = 1;
         g_CameraDistance = CameraDistance_save;
         g_CameraPhi = CameraPhi_FC_save;
         g_CameraTheta = CameraTheta_FC_save;
     }
     if (key == GLFW_KEY_2 && action == GLFW_PRESS){
-        camera_ID = 2;
+        camera_view_ID = 2;
     }
 
 
@@ -1328,6 +1331,23 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     if (key == GLFW_KEY_D)
         pressedD = (action == GLFW_RELEASE) ? 0 : 1;
+
+
+    // Andar entre os estandes
+    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS && camera_view_ID==2) {
+        if ( estande_atual == QUANT_ESTANDE-1 ){
+            estande_atual = 0;
+        } else {
+            estande_atual += 1;
+        }
+    }
+    if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && camera_view_ID) {
+        if ( estande_atual == 0 ){
+            estande_atual = QUANT_ESTANDE-1;
+        } else {
+            estande_atual -= 1;
+        }
+    }
 
 }
 
