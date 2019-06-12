@@ -32,6 +32,8 @@
 #include <stdexcept>
 #include <algorithm>
 
+#include <iostream>
+
 // Headers das bibliotecas OpenGL
 #include <glad/glad.h>   // Criação de contexto OpenGL 3.3
 #include <GLFW/glfw3.h>  // Criação de janelas do sistema operacional
@@ -383,6 +385,8 @@ int main(int argc, char* argv[])
         float y = r*sin_g_CameraPhi;
         float z = r*cos_g_CameraPhi*cos_g_CameraTheta;
         float x = r*cos_g_CameraPhi*sin_g_CameraTheta;
+
+        // std::cout << x << ' ' << y << ' ' << z << std::endl;
 
         glm::vec4 camera_position_c;
         glm::vec4 camera_lookat_l;
