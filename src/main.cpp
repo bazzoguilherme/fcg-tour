@@ -429,10 +429,10 @@ int main(int argc, char* argv[])
         // LOOK AT CAMERA
         } else {
 
-            camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
             //camera_position_c  = glm::vec4(-0.0f, 1.5f, 9.5f,1.0f); // Ponto "c", centro da câmera
             //camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.0f, posicoes_estandes[estande_atual].z, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            camera_position_c  = camera_lookat_l + glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
         }
 
@@ -1346,6 +1346,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             //x = posicoes_estandes[estande_atual].x;
             //y = posicoes_estandes[estande_atual].y;
             //z = posicoes_estandes[estande_atual].z;
+
         }
     }
     if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && camera_view_ID) {
