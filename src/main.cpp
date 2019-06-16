@@ -195,8 +195,6 @@ float g_CamDistanceZ = 0.0f;
 int pressedW =0, pressedS=0, pressedA=0, pressedD=0;
 
 // Tipo de camera
-// 1: Free Camera
-// 2: Look-at-Camera
 int camera_view_ID = FREE_CAMERA;
 
 float y;
@@ -521,14 +519,14 @@ int main(int argc, char* argv[])
 
         // Imprimimos na tela os ângulos de Euler que controlam a rotação do
         // terceiro cubo.
-        TextRendering_ShowEulerAngles(window);
+        //TextRendering_ShowEulerAngles(window);
 
         // Imprimimos na informação sobre a matriz de projeção sendo utilizada.
-        TextRendering_ShowProjection(window);
+        //TextRendering_ShowProjection(window);
 
         // Imprimimos na tela informação sobre o número de quadros renderizados
         // por segundo (frames per second).
-        TextRendering_ShowFramesPerSecond(window);
+        //TextRendering_ShowFramesPerSecond(window);
 
         // O framebuffer onde OpenGL executa as operações de renderização não
         // é o mesmo que está sendo mostrado para o usuário, caso contrário
