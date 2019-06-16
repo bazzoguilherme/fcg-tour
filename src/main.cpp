@@ -1168,7 +1168,12 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 
         // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
         float phimax = M_PI/4;
-        float phimin = -M_PI/15;
+
+        float phimin = -M_PI/3;
+
+        if (camera_view_ID == 2){
+            phimin = -M_PI/15;
+        }
 
         if (g_CameraPhi > phimax)
             g_CameraPhi = phimax;
