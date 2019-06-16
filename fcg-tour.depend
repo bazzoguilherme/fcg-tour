@@ -652,7 +652,7 @@
 	<fstream>
 	<sstream>
 
-1560300489 source:c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\src\main.cpp
+1560642904 source:c:\users\bazzo\documents\ufrgs\semestre_5\fcg\trabalho_final\fcg-tour\src\main.cpp
 	<cmath>
 	<cstdio>
 	<cstdlib>
@@ -665,6 +665,7 @@
 	<sstream>
 	<stdexcept>
 	<algorithm>
+	<iostream>
 	<glad/glad.h>
 	<GLFW/glfw3.h>
 	<glm/mat4x4.hpp>

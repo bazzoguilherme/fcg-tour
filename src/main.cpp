@@ -347,7 +347,8 @@ int main(int argc, char* argv[])
 
         // Controle do tempo no movimento para reposicionamento da câmera com WASD keys
         time_now = glfwGetTime();
-        passo_tempo = 3*(time_now - time_prev);
+        passo_tempo = (time_now - time_prev);
+        double passo_camera = passo_tempo*3.0f;
         time_prev = time_now;
 
         // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
@@ -399,28 +400,28 @@ int main(int argc, char* argv[])
 
             if (pressedW)
             {
-                //g_CamDistanceY -= (passo_tempo*sin_g_CameraPhi);
-                g_CamDistanceZ -= (passo_tempo * cos_g_CameraTheta);
-                g_CamDistanceX -= (passo_tempo * sin_g_CameraTheta);
+                //g_CamDistanceY -= (passo_camera*sin_g_CameraPhi);
+                g_CamDistanceZ -= (passo_camera * cos_g_CameraTheta);
+                g_CamDistanceX -= (passo_camera * sin_g_CameraTheta);
             }
 
             if (pressedS)
             {
-                //g_CamDistanceY += (passo_tempo*sin_g_CameraPhi);
-                g_CamDistanceZ += (passo_tempo * cos_g_CameraTheta);
-                g_CamDistanceX += (passo_tempo * sin_g_CameraTheta);
+                //g_CamDistanceY += (passo_camera*sin_g_CameraPhi);
+                g_CamDistanceZ += (passo_camera * cos_g_CameraTheta);
+                g_CamDistanceX += (passo_camera * sin_g_CameraTheta);
             }
 
             if (pressedA)
             {
-                g_CamDistanceX -= (passo_tempo * cos_g_CameraTheta);
-                g_CamDistanceZ += (passo_tempo * sin_g_CameraTheta);
+                g_CamDistanceX -= (passo_camera * cos_g_CameraTheta);
+                g_CamDistanceZ += (passo_camera * sin_g_CameraTheta);
             }
 
             if (pressedD)
             {
-                g_CamDistanceX += (passo_tempo * cos_g_CameraTheta);
-                g_CamDistanceZ -= (passo_tempo * sin_g_CameraTheta);
+                g_CamDistanceX += (passo_camera * cos_g_CameraTheta);
+                g_CamDistanceZ -= (passo_camera * sin_g_CameraTheta);
             }
 
             camera_position_c  = glm::vec4(g_CamDistanceX,g_CamDistanceY,g_CamDistanceZ,1.0f);
@@ -429,10 +430,10 @@ int main(int argc, char* argv[])
         // LOOK AT CAMERA
         } else {
 
-            //camera_position_c  = glm::vec4(-0.0f, 1.5f, 9.5f,1.0f); // Ponto "c", centro da câmera
+            camera_position_c  = glm::vec4(-0.0f, 1.0f, 10.0f,1.0f); // Ponto "c", centro da câmera
             //camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.0f, posicoes_estandes[estande_atual].z, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-            camera_position_c  = camera_lookat_l + glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
+            //camera_position_c  = camera_lookat_l + glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
         }
 
