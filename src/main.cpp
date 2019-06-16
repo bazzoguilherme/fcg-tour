@@ -19,6 +19,9 @@
 #define HEIGHT 600
 #define WINDOW_TITLE "FCG Tour"
 
+#define FREE_CAMERA 1
+#define LOOK_AT_CAMERA 2
+
 #define M_PI   3.14159265358979323846
 
 // Headers abaixo são específicos de C++
@@ -194,7 +197,7 @@ int pressedW =0, pressedS=0, pressedA=0, pressedD=0;
 // Tipo de camera
 // 1: Free Camera
 // 2: Look-at-Camera
-int camera_view_ID = 1;
+int camera_view_ID = FREE_CAMERA;
 
 float y;
 float z;
@@ -386,15 +389,13 @@ int main(int argc, char* argv[])
         z = r*cos_g_CameraPhi*cos_g_CameraTheta;
         x = r*cos_g_CameraPhi*sin_g_CameraTheta;
 
-        // std::cout << x << ' ' << y << ' ' << z << std::endl;
-
         glm::vec4 camera_position_c;
         glm::vec4 camera_lookat_l;
         glm::vec4 camera_view_vector;
         glm::vec4 camera_up_vector;
 
         // FREE CAMERA
-        if(camera_view_ID == 1){
+        if(camera_view_ID == FREE_CAMERA){
 
             CameraDistance_save = g_CameraDistance;
             CameraPhi_FC_save = g_CameraPhi;
@@ -431,25 +432,23 @@ int main(int argc, char* argv[])
 
         // LOOK AT CAMERA
         } else {
-
-            camera_position_c  = glm::vec4(posicoes_estandes[estande_atual].x, y, posicoes_estandes[estande_atual].z - (1.5f*sgn(posicoes_estandes[estande_atual].z)),1.0f); // Ponto "c", centro da câmera
-            //camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            // Ponto "c", centro da câmera
+            camera_position_c  = glm::vec4(posicoes_estandes[estande_atual].x, y, posicoes_estandes[estande_atual].z - (1.5f*sgn(posicoes_estandes[estande_atual].z)),1.0f);
+            // Ponto "l", onde câmera está olhando
             camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.2f, posicoes_estandes[estande_atual].z, 1.0f);
-            //camera_position_c  = camera_lookat_l + glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
+            // Vetor "view", sentido para onde a câmera está virada
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
         }
 
         camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
-        // Computamos a matriz "View" utilizando os parâmetros da câmera para
-        // definir o sistema de coordenadas da câmera.  Veja slide 186 do documento "Aula_08_Sistemas_de_Coordenadas.pdf".
+        // Computamos a matriz "View" utilizando os parâmetros da câmera para definir o sistema de coordenadas da câmera.
         glm::mat4 view = Matrix_Camera_View(camera_position_c, camera_view_vector, camera_up_vector);
 
         // Agora computamos a matriz de Projeção.
         glm::mat4 projection;
 
-        // Note que, no sistema de coordenadas da câmera, os planos near e far
-        // estão no sentido negativo! Veja slides 190-193 do documento "Aula_09_Projecoes.pdf".
+        // Note que, no sistema de coordenadas da câmera, os planos near e far estão no sentido negativo!
         float nearplane = -0.1f;  // Posição do "near plane"
         float farplane  = -60.0f; // Posição do "far plane"
 
@@ -555,6 +554,17 @@ int main(int argc, char* argv[])
 
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
+}
+
+void load_free_camera(){
+    camera_view_ID = FREE_CAMERA;
+    g_CameraDistance = CameraDistance_save;
+    g_CameraPhi = CameraPhi_FC_save;
+    g_CameraTheta = CameraTheta_FC_save;
+}
+
+void load_look_at_camera(){
+    camera_view_ID = LOOK_AT_CAMERA;
 }
 
 // Função que carrega uma imagem para ser utilizada como textura
@@ -1177,7 +1187,7 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 
         float phimin = -M_PI/3;
 
-        if (camera_view_ID == 2){
+        if (camera_view_ID == LOOK_AT_CAMERA){
             phimin = -M_PI/15;
         }
 
@@ -1257,7 +1267,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     // Se o usuário pressionar a tecla ESC, fechamos a janela.
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GL_TRUE);
+        if (camera_view_ID == LOOK_AT_CAMERA)
+            load_free_camera();
+        else
+            glfwSetWindowShouldClose(window, GL_TRUE);
 
     // O código abaixo implementa a seguinte lógica:
     //   Se apertar tecla X       então g_AngleX += delta;
@@ -1325,13 +1338,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     // Atual controle sobre qual camera usar
     if (key == GLFW_KEY_1 && action == GLFW_PRESS){
-        camera_view_ID = 1;
-        g_CameraDistance = CameraDistance_save;
-        g_CameraPhi = CameraPhi_FC_save;
-        g_CameraTheta = CameraTheta_FC_save;
+        load_free_camera();
     }
     if (key == GLFW_KEY_2 && action == GLFW_PRESS){
-        camera_view_ID = 2;
+        load_look_at_camera();
     }
 
 
@@ -1355,10 +1365,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             estande_atual = 0;
         } else {
             estande_atual += 1;
-            //x = posicoes_estandes[estande_atual].x;
-            //y = posicoes_estandes[estande_atual].y;
-            //z = posicoes_estandes[estande_atual].z;
-
         }
     }
     if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && camera_view_ID) {
