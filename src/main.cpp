@@ -430,9 +430,9 @@ int main(int argc, char* argv[])
         // LOOK AT CAMERA
         } else {
 
-            camera_position_c  = glm::vec4(-0.0f, 1.0f, 10.0f,1.0f); // Ponto "c", centro da câmera
+            camera_position_c  = glm::vec4(-0.0f, y, 9.5f,1.0f); // Ponto "c", centro da câmera
             //camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-            camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.0f, posicoes_estandes[estande_atual].z, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.2f, posicoes_estandes[estande_atual].z, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
             //camera_position_c  = camera_lookat_l + glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
         }
@@ -1167,8 +1167,8 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         g_CameraPhi   += 0.01f*dy;
 
         // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
-        float phimax = 3.141592f/2;
-        float phimin = -phimax;
+        float phimax = M_PI/4;
+        float phimin = -M_PI/15;
 
         if (g_CameraPhi > phimax)
             g_CameraPhi = phimax;
