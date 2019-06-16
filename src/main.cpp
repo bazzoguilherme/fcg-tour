@@ -128,6 +128,8 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
+template <typename T> int sgn(T val);
+
 // Definimos uma estrutura que armazenará dados necessários para renderizar
 // cada objeto da cena virtual.
 struct SceneObject
@@ -430,9 +432,9 @@ int main(int argc, char* argv[])
         // LOOK AT CAMERA
         } else {
 
-            camera_position_c  = glm::vec4(-0.0f, y, 9.5f,1.0f); // Ponto "c", centro da câmera
+            camera_position_c  = glm::vec4(posicoes_estandes[estande_atual].x, y, posicoes_estandes[estande_atual].z - (1.5f*sgn(posicoes_estandes[estande_atual].z)),1.0f); // Ponto "c", centro da câmera
             //camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-            camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.2f, posicoes_estandes[estande_atual].z, 1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+            camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.2f, posicoes_estandes[estande_atual].z, 1.0f);
             //camera_position_c  = camera_lookat_l + glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
         }
@@ -549,6 +551,10 @@ int main(int argc, char* argv[])
 
     // Fim do programa
     return 0;
+}
+
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
 }
 
 // Função que carrega uma imagem para ser utilizada como textura
