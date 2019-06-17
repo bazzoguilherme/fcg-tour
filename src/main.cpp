@@ -22,6 +22,8 @@
 #define FREE_CAMERA 1
 #define LOOK_AT_CAMERA 2
 
+#define ERRO_COLISAO 0.1f
+
 #define M_PI   3.14159265358979323846
 
 // Headers abaixo são específicos de C++
@@ -132,14 +134,18 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 template <typename T> int sgn(T val);
+bool check_inside_museum(float x, float z);
+float F_p1_p2(glm::vec3 v, glm::vec3 a, float x, float z);
+
+bool check_colision(float x, float z);
 
 // Definimos uma estrutura que armazenará dados necessários para renderizar
 // cada objeto da cena virtual.
 struct SceneObject
 {
     std::string  name;        // Nome do objeto
-    size_t        first_index; // Índice do primeiro vértice dentro do vetor indices[] definido em BuildTrianglesAndAddToVirtualScene()
-    size_t          num_indices; // Número de índices do objeto dentro do vetor indices[] definido em BuildTrianglesAndAddToVirtualScene()
+    size_t       first_index; // Índice do primeiro vértice dentro do vetor indices[] definido em BuildTrianglesAndAddToVirtualScene()
+    size_t       num_indices; // Número de índices do objeto dentro do vetor indices[] definido em BuildTrianglesAndAddToVirtualScene()
     GLenum       rendering_mode; // Modo de rasterização (GL_TRIANGLES, GL_TRIANGLE_STRIP, etc.)
     GLuint       vertex_array_object_id; // ID do VAO onde estão armazenados os atributos do modelo
     glm::vec3    bbox_min; // Axis-Aligned Bounding Box do objeto
@@ -204,6 +210,15 @@ float x;
 #define QUANT_ESTANDE 20
 std::vector<glm::vec4> posicoes_estandes;
 int estande_atual = 0;
+
+struct museu_bbox{
+    glm::vec3   p1;
+    glm::vec3   p2;
+    glm::vec3   p3;
+    glm::vec3   p4;
+};
+
+struct museu_bbox Museu;
 
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
@@ -399,33 +414,53 @@ int main(int argc, char* argv[])
             CameraPhi_FC_save = g_CameraPhi;
             CameraTheta_FC_save = g_CameraTheta;
 
+            float new_z = 0.0f;
+            float new_x = 0.0f;
+
             if (pressedW)
             {
                 //g_CamDistanceY -= (passo_camera*sin_g_CameraPhi);
-                g_CamDistanceZ -= (passo_camera * cos_g_CameraTheta);
-                g_CamDistanceX -= (passo_camera * sin_g_CameraTheta);
+                new_z = g_CamDistanceZ - (passo_camera * cos_g_CameraTheta);
+                new_x = g_CamDistanceX - (passo_camera * sin_g_CameraTheta);
+                if (check_colision(new_x, new_z)){
+                    g_CamDistanceZ = new_z;
+                    g_CamDistanceX = new_x;
+                }
             }
 
             if (pressedS)
             {
                 //g_CamDistanceY += (passo_camera*sin_g_CameraPhi);
-                g_CamDistanceZ += (passo_camera * cos_g_CameraTheta);
-                g_CamDistanceX += (passo_camera * sin_g_CameraTheta);
+                new_z = g_CamDistanceZ + (passo_camera * cos_g_CameraTheta);
+                new_x = g_CamDistanceX + (passo_camera * sin_g_CameraTheta);
+                if (check_colision(new_x, new_z)){
+                    g_CamDistanceZ = new_z;
+                    g_CamDistanceX = new_x;
+                }
             }
 
             if (pressedA)
             {
-                g_CamDistanceX -= (passo_camera * cos_g_CameraTheta);
-                g_CamDistanceZ += (passo_camera * sin_g_CameraTheta);
+                new_x = g_CamDistanceX - (passo_camera * cos_g_CameraTheta);
+                new_z = g_CamDistanceZ + (passo_camera * sin_g_CameraTheta);
+                if (check_colision(new_x, new_z)){
+                    g_CamDistanceZ = new_z;
+                    g_CamDistanceX = new_x;
+                }
             }
 
             if (pressedD)
             {
-                g_CamDistanceX += (passo_camera * cos_g_CameraTheta);
-                g_CamDistanceZ -= (passo_camera * sin_g_CameraTheta);
+                new_x = g_CamDistanceX + (passo_camera * cos_g_CameraTheta);
+                new_z = g_CamDistanceZ - (passo_camera * sin_g_CameraTheta);
+                if (check_colision(new_x, new_z)){
+                    g_CamDistanceZ = new_z;
+                    g_CamDistanceX = new_x;
+                }
             }
 
             camera_position_c  = glm::vec4(g_CamDistanceX,g_CamDistanceY,g_CamDistanceZ,1.0f);
+            //printf("x: %f; z: %f\n", g_CamDistanceX, g_CamDistanceZ);
             camera_view_vector = glm::vec4(-x, -y, -z, 0.0);
 
         // LOOK AT CAMERA
@@ -447,7 +482,7 @@ int main(int argc, char* argv[])
         glm::mat4 projection;
 
         // Note que, no sistema de coordenadas da câmera, os planos near e far estão no sentido negativo!
-        float nearplane = -0.1f;  // Posição do "near plane"
+        float nearplane = -0.05f;  // Posição do "near plane"
         float farplane  = -60.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
@@ -488,6 +523,11 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, MUSEU);
         DrawVirtualObject("museu");
+
+        Museu.p1 = glm::vec3(-47.0f + ERRO_COLISAO, 1.0f, -12.0f + ERRO_COLISAO);
+        Museu.p2 = glm::vec3(3.0f - ERRO_COLISAO, 1.0f, -12.0f + ERRO_COLISAO);
+        Museu.p3 = glm::vec3(3.0f - ERRO_COLISAO, 1.0f, 12.0f - ERRO_COLISAO);
+        Museu.p4 = glm::vec3(-47.0f + ERRO_COLISAO, 1.0f, 12.0f - ERRO_COLISAO);
 
         for (float estandes = 0; estandes<10*4; estandes+=4){
             model = Matrix_Translate(-1.2f*estandes, -4.8f, -11.0f)
@@ -565,8 +605,30 @@ void load_look_at_camera(){
     camera_view_ID = LOOK_AT_CAMERA;
 }
 
-bool check_inside_museum(){
+bool check_inside_museum(float x,  float z){
+    glm::vec3 p_41 = Museu.p4 - Museu.p1;
+    glm::vec3 p_24 = Museu.p2 - Museu.p4;
+    glm::vec3 p_12 = Museu.p1 - Museu.p2;
 
+    glm::vec3 p_23 = Museu.p2 - Museu.p3;
+    glm::vec3 p_42 = Museu.p4 - Museu.p2;
+    glm::vec3 p_34 = Museu.p3 - Museu.p4;
+
+    bool t1 = F_p1_p2(p_41, Museu.p4, x, z) > 0 && F_p1_p2(p_24, Museu.p2, x, z) > 0 && F_p1_p2(p_12, Museu.p1, x, z) > 0;
+    bool t2 = F_p1_p2(p_23, Museu.p2, x, z) > 0 && F_p1_p2(p_42, Museu.p4, x, z) > 0 && F_p1_p2(p_34, Museu.p3, x, z) > 0;
+
+    if (t1 || t2) {
+        return true;
+    }
+    return false;
+}
+
+float F_p1_p2(glm::vec3 v, glm::vec3 a, float x, float z){
+    return v.z*x - v.x*z - v.z*a.x + v.x*a.z;
+}
+
+bool check_colision(float x, float z){
+    return check_inside_museum(x, z);
 }
 
 // Função que carrega uma imagem para ser utilizada como textura
