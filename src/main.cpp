@@ -529,6 +529,20 @@ int main(int argc, char* argv[])
         Museu.p3 = glm::vec3(3.0f - ERRO_COLISAO, 1.0f, 12.0f - ERRO_COLISAO);
         Museu.p4 = glm::vec3(-47.0f + ERRO_COLISAO, 1.0f, 12.0f - ERRO_COLISAO);
 
+
+        glm::vec3 museu_min = g_VirtualScene["museu"].bbox_min;
+        glm::vec3 museu_max = g_VirtualScene["museu"].bbox_max;
+        glm::vec4 museu_min_vec4 = glm::vec4(museu_min.x, museu_min.y, museu_min.z, 1.0f);
+        glm::vec4 museu_max_vec4 = glm::vec4(museu_max.x, museu_max.y, museu_max.z, 1.0f);
+
+        glm::vec4 posMin = model * museu_min_vec4;
+        glm::vec4 posMax = model * museu_max_vec4;
+
+        //printf("Min:> x: %f :: z: %f\n", posMin.x, posMin.z);
+        //printf("Max:> x: %f :: z: %f\n\n", posMax.x, posMax.z);
+
+
+
         for (float estandes = 0; estandes<10*4; estandes+=4){
             model = Matrix_Translate(-1.2f*estandes, -4.8f, -11.0f)
                   * Matrix_Scale(0.95f, 1.2f, 0.95f);
