@@ -21,6 +21,7 @@ uniform mat4 projection;
 // Identificador que define qual objeto está sendo desenhado no momento
 #define MUSEU 0
 #define ESTANDE 1
+#define DINOSSAURO 2
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -100,6 +101,17 @@ void main()
         U = texcoords.x;
         V = texcoords.y;
         Kd = texture(TextureImage1, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        //Kd = vec3(0.640000, 0.640000, 0.640000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+
+    } else if ( object_id == DINOSSAURO )
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd = texture(TextureImage2, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
         //Kd = vec3(0.640000, 0.640000, 0.640000);
