@@ -211,14 +211,15 @@ float x;
 std::vector<glm::vec4> posicoes_estandes;
 int estande_atual = 0;
 
-struct museu_bbox{
+struct square_bbox{
     glm::vec3   p1;
     glm::vec3   p2;
     glm::vec3   p3;
     glm::vec3   p4;
 };
 
-struct museu_bbox Museu;
+struct square_bbox Museu;
+std::vector<square_bbox> estandes_bbox;
 
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
@@ -524,12 +525,6 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, MUSEU);
         DrawVirtualObject("museu");
 
-        Museu.p1 = glm::vec3(-47.0f + ERRO_COLISAO, 1.0f, -12.0f + ERRO_COLISAO);
-        Museu.p2 = glm::vec3(3.0f - ERRO_COLISAO, 1.0f, -12.0f + ERRO_COLISAO);
-        Museu.p3 = glm::vec3(3.0f - ERRO_COLISAO, 1.0f, 12.0f - ERRO_COLISAO);
-        Museu.p4 = glm::vec3(-47.0f + ERRO_COLISAO, 1.0f, 12.0f - ERRO_COLISAO);
-
-
         glm::vec3 museu_min = g_VirtualScene["museu"].bbox_min;
         glm::vec3 museu_max = g_VirtualScene["museu"].bbox_max;
         glm::vec4 museu_min_vec4 = glm::vec4(museu_min.x, museu_min.y, museu_min.z, 1.0f);
@@ -537,6 +532,12 @@ int main(int argc, char* argv[])
 
         glm::vec4 posMin = model * museu_min_vec4;
         glm::vec4 posMax = model * museu_max_vec4;
+
+        Museu.p1 = glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO);
+        Museu.p2 = glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO);
+        Museu.p3 = glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO);
+        Museu.p4 = glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO);
+
 
         //printf("Min:> x: %f :: z: %f\n", posMin.x, posMin.z);
         //printf("Max:> x: %f :: z: %f\n\n", posMax.x, posMax.z);
@@ -551,6 +552,19 @@ int main(int argc, char* argv[])
             DrawVirtualObject("estande");
 
             posicoes_estandes.push_back(glm::vec4(-1.2f*estandes, -4.8f, -11.0f, 1.0f));
+
+            glm::vec3 estande_min = g_VirtualScene["estande"].bbox_min;
+            glm::vec3 estande_max = g_VirtualScene["estande"].bbox_max;
+            glm::vec4 estande_min_vec4 = glm::vec4(estande_min.x, estande_min.y, estande_min.z, 1.0f);
+            glm::vec4 estande_max_vec4 = glm::vec4(estande_max.x, estande_max.y, estande_max.z, 1.0f);
+
+            glm::vec4 posMin = model * estande_min_vec4;
+            glm::vec4 posMax = model * estande_max_vec4;
+
+            estandes_bbox.push_back( {glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO) });
+            estandes_bbox.push_back( {glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO) });
+            estandes_bbox.push_back( {glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO) });
+            estandes_bbox.push_back( {glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO) });
         }
 
         for (float estandes = 0; estandes<10*4; estandes+=4){
@@ -562,6 +576,19 @@ int main(int argc, char* argv[])
             DrawVirtualObject("estande");
 
             posicoes_estandes.push_back(glm::vec4(-1.2f*estandes, -4.8f, 11.0f, 1.0f));
+
+            glm::vec3 estande_min = g_VirtualScene["estande"].bbox_min;
+            glm::vec3 estande_max = g_VirtualScene["estande"].bbox_max;
+            glm::vec4 estande_min_vec4 = glm::vec4(estande_min.x, estande_min.y, estande_min.z, 1.0f);
+            glm::vec4 estande_max_vec4 = glm::vec4(estande_max.x, estande_max.y, estande_max.z, 1.0f);
+
+            glm::vec4 posMin = model * estande_min_vec4;
+            glm::vec4 posMax = model * estande_max_vec4;
+
+            estandes_bbox.push_back( {glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO) });
+            estandes_bbox.push_back( {glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO) });
+            estandes_bbox.push_back( {glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO) });
+            estandes_bbox.push_back( {glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO) });
         }
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
