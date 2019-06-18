@@ -561,10 +561,14 @@ int main(int argc, char* argv[])
             glm::vec4 posMin = model * estande_min_vec4;
             glm::vec4 posMax = model * estande_max_vec4;
 
-            estandes_bbox.push_back( {glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO) });
-            estandes_bbox.push_back( {glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO) });
-            estandes_bbox.push_back( {glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO) });
-            estandes_bbox.push_back( {glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO) });
+            struct square_bbox estande;
+
+            estande.p1 = glm::vec3(posMin.x - ERRO_COLISAO, 1.0f, posMin.z - ERRO_COLISAO);
+            estande.p2 = glm::vec3(posMax.x + ERRO_COLISAO, 1.0f, posMin.z - ERRO_COLISAO);
+            estande.p3 = glm::vec3(posMax.x + ERRO_COLISAO, 1.0f, posMax.z + ERRO_COLISAO);
+            estande.p4 = glm::vec3(posMin.x - ERRO_COLISAO, 1.0f, posMax.z + ERRO_COLISAO);
+
+            estandes_bbox.push_back(estande);
         }
 
         for (float estandes = 0; estandes<10*4; estandes+=4){
@@ -585,10 +589,14 @@ int main(int argc, char* argv[])
             glm::vec4 posMin = model * estande_min_vec4;
             glm::vec4 posMax = model * estande_max_vec4;
 
-            estandes_bbox.push_back( {glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO) });
-            estandes_bbox.push_back( {glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO) });
-            estandes_bbox.push_back( {glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO) });
-            estandes_bbox.push_back( {glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO) });
+            struct square_bbox estande;
+
+            estande.p1 = glm::vec3(posMin.x - ERRO_COLISAO, 1.0f, posMin.z - ERRO_COLISAO);
+            estande.p2 = glm::vec3(posMax.x + ERRO_COLISAO, 1.0f, posMin.z - ERRO_COLISAO);
+            estande.p3 = glm::vec3(posMax.x + ERRO_COLISAO, 1.0f, posMax.z + ERRO_COLISAO);
+            estande.p4 = glm::vec3(posMin.x - ERRO_COLISAO, 1.0f, posMax.z + ERRO_COLISAO);
+
+            estandes_bbox.push_back(estande);
         }
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
@@ -646,6 +654,7 @@ void load_look_at_camera(){
     camera_view_ID = LOOK_AT_CAMERA;
 }
 
+/// return true if inside museum
 bool check_inside_museum(float x,  float z){
     glm::vec3 p_41 = Museu.p4 - Museu.p1;
     glm::vec3 p_24 = Museu.p2 - Museu.p4;
@@ -664,12 +673,39 @@ bool check_inside_museum(float x,  float z){
     return false;
 }
 
+/// return true if outside estande
+bool check_estande(struct square_bbox estande, float x, float z){
+    glm::vec3 p_41 = estande.p4 - estande.p1;
+    glm::vec3 p_24 = estande.p2 - estande.p4;
+    glm::vec3 p_12 = estande.p1 - estande.p2;
+
+    glm::vec3 p_23 = estande.p2 - estande.p3;
+    glm::vec3 p_42 = estande.p4 - estande.p2;
+    glm::vec3 p_34 = estande.p3 - estande.p4;
+
+    bool t1 = F_p1_p2(p_41, estande.p4, x, z) >= 0 && F_p1_p2(p_24, estande.p2, x, z) >= 0 && F_p1_p2(p_12, estande.p1, x, z) >= 0;
+    bool t2 = F_p1_p2(p_23, estande.p2, x, z) >= 0 && F_p1_p2(p_42, estande.p4, x, z) >= 0 && F_p1_p2(p_34, estande.p3, x, z) >= 0;
+
+    if (t1 || t2) {
+        return false;
+    }
+    return true;
+}
+
+bool check_estandes(float x, float z){
+    bool colisoes_estandes = true;
+    for (int i=0; i != QUANT_ESTANDE; i++){
+        colisoes_estandes = colisoes_estandes && check_estande(estandes_bbox[i], x, z);
+    }
+    return colisoes_estandes;
+}
+
 float F_p1_p2(glm::vec3 v, glm::vec3 a, float x, float z){
     return v.z*x - v.x*z - v.z*a.x + v.x*a.z;
 }
 
 bool check_colision(float x, float z){
-    return check_inside_museum(x, z);
+    return check_inside_museum(x, z) && check_estandes(x, z);
 }
 
 // Função que carrega uma imagem para ser utilizada como textura
