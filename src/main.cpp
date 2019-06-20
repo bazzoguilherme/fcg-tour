@@ -243,6 +243,8 @@ int opcao_estande1 = 0;
 
 int cor_lampada = 1;
 
+int direcao_textura_plana = 1;
+
 struct square_bbox{
     glm::vec3   p1;
     glm::vec3   p2;
@@ -275,6 +277,7 @@ GLint bbox_max_uniform;
 GLint estande_shader;
 GLint acerto_ou_erro_est1;
 GLint cor_lampada_shader;
+GLint direcao_textura_plana_shader;
 
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
@@ -352,7 +355,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "esfera", "cubo", "rosquinha_1", "rosquinha_2", "lampada"};
+    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "esfera", "cubo", "rosquinha_1", "rosquinha_2", "lampada", "chaleira"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -575,6 +578,7 @@ int main(int argc, char* argv[])
         glUniform1i(estande_shader, estande_atual);
         glUniform1i(acerto_ou_erro_est1, opcao_estande1);
         glUniform1i(cor_lampada_shader, cor_lampada);
+        glUniform1i(direcao_textura_plana_shader, direcao_textura_plana);
 
 
         #define MUSEU 0
@@ -587,6 +591,10 @@ int main(int argc, char* argv[])
         #define ROSQUINHA_1 7
         #define ROSQUINHA_2 8
         #define LAMPADA 9
+        #define CHALEIRA_PLANA 10
+        #define CHALEIRA_CUBICA 11
+        #define CHALEIRA_ESFERICA 12
+        #define CHALEIRA_CILINDRICA 13
 
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
@@ -781,6 +789,38 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, ESFERA);
         DrawVirtualObject("esfera");
+
+        // estande 14
+        model = Matrix_Translate(posicoes_estandes[14-1].x, posicoes_estandes[14-1].y + 3.8f, posicoes_estandes[14-1].z)
+              * Matrix_Scale(3.5f, 3.5f, 3.5f)
+              * Matrix_Rotate_Y((float)glfwGetTime() * 0.25f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, CHALEIRA_PLANA);
+        DrawVirtualObject("chaleira");
+
+        // estande 15
+        model = Matrix_Translate(posicoes_estandes[15-1].x, posicoes_estandes[15-1].y + 3.8f, posicoes_estandes[15-1].z)
+              * Matrix_Scale(3.5f, 3.5f, 3.5f)
+              * Matrix_Rotate_Y((float)glfwGetTime() * 0.25f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, CHALEIRA_CUBICA);
+        DrawVirtualObject("chaleira");
+
+        // estande 16
+        model = Matrix_Translate(posicoes_estandes[16-1].x, posicoes_estandes[16-1].y + 3.8f, posicoes_estandes[16-1].z)
+              * Matrix_Scale(3.5f, 3.5f, 3.5f)
+              * Matrix_Rotate_Y((float)glfwGetTime() * 0.25f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, CHALEIRA_ESFERICA);
+        DrawVirtualObject("chaleira");
+
+        // estande 17
+        model = Matrix_Translate(posicoes_estandes[17-1].x, posicoes_estandes[17-1].y + 3.8f, posicoes_estandes[17-1].z)
+              * Matrix_Scale(3.5f, 3.5f, 3.5f)
+              * Matrix_Rotate_Y((float)glfwGetTime() * 0.25f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, CHALEIRA_CILINDRICA);
+        DrawVirtualObject("chaleira");
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
@@ -1046,6 +1086,7 @@ void LoadShadersFromFiles()
     estande_shader = glGetUniformLocation(program_id, "estande_atual");
     acerto_ou_erro_est1 = glGetUniformLocation(program_id, "acerto_ou_erro_est1");
     cor_lampada_shader = glGetUniformLocation(program_id, "cor_lampada");
+    direcao_textura_plana_shader = glGetUniformLocation(program_id, "direcao_planar");
 
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
@@ -1750,6 +1791,17 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_6 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 10-1){
         cor_lampada = 6;
     }
+
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 14-1){
+        direcao_textura_plana = 1;
+    }
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 14-1){
+        direcao_textura_plana = 2;
+    }
+    if (key == GLFW_KEY_3 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 14-1){
+        direcao_textura_plana = 3;
+    }
+
 
 
 

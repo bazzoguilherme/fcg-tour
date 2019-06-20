@@ -29,6 +29,10 @@ uniform mat4 projection;
 #define ROSQUINHA_1 7
 #define ROSQUINHA_2 8
 #define LAMPADA 9
+#define CHALEIRA_PLANA 10
+#define CHALEIRA_CUBICA 11
+#define CHALEIRA_ESFERICA 12
+#define CHALEIRA_CILINDRICA 13
 
 uniform int object_id;
 
@@ -60,6 +64,7 @@ uniform sampler2D TextureImage17;
 uniform int estande_atual = 0;
 uniform int acerto_ou_erro_est1 = 0;
 uniform int cor_lampada = 1;
+uniform int direcao_planar = 1;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
@@ -120,7 +125,6 @@ void main()
         Kd = texture(TextureImage0, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        //Kd = vec3(0.640000, 0.640000, 0.640000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
 
@@ -137,7 +141,6 @@ void main()
             Kd = texture(TextureImage1, vec2(U,V)).rgb ;
         }
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        //Kd = vec3(0.640000, 0.640000, 0.640000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
 
@@ -148,7 +151,6 @@ void main()
         Kd = texture(TextureImage4, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        //Kd = vec3(0.640000, 0.640000, 0.640000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
 
@@ -171,7 +173,6 @@ void main()
         Kd = texture(TextureImage6, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        //Kd = vec3(0.640000, 0.640000, 0.640000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
     }
@@ -192,7 +193,6 @@ void main()
         Kd = texture(TextureImage8, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        //Kd = vec3(0.640000, 0.640000, 0.640000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
     }
@@ -203,7 +203,6 @@ void main()
         Kd = texture(TextureImage9, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        //Kd = vec3(0.640000, 0.640000, 0.640000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
     }
@@ -214,7 +213,6 @@ void main()
         Kd = texture(TextureImage10, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        //Kd = vec3(0.640000, 0.640000, 0.640000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
     }
@@ -237,10 +235,77 @@ void main()
 
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        //Kd = vec3(0.640000, 0.640000, 0.640000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
     }
+    else if (object_id == CHALEIRA_PLANA)
+    {
+        float minx = bbox_min.x;
+        float maxx = bbox_max.x;
+
+        float miny = bbox_min.y;
+        float maxy = bbox_max.y;
+
+        float minz = bbox_min.z;
+        float maxz = bbox_max.z;
+
+        if (direcao_planar == 1){
+            U = (position_model.x - minx)/(maxx-minx);
+            V = (position_model.y - miny)/(maxy-miny);
+        } else if (direcao_planar == 2){
+            U = (position_model.x - minx)/(maxx-minx);
+            V = (position_model.z - minz)/(maxz-minz);
+        } else if (direcao_planar == 3){
+            U = (position_model.y - miny)/(maxy-miny);
+            V = (position_model.z - minz)/(maxz-minz);
+        }
+
+        Kd = texture(TextureImage17, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+    }
+    else if (object_id == CHALEIRA_CUBICA)
+    {
+
+    }
+    else if (object_id == CHALEIRA_ESFERICA)
+    {
+        vec4 c = (bbox_min + bbox_max) / 2.0;
+
+        vec4 p_line = c + normalize(position_model - c);
+
+        vec4 p_vec = p_line - c;
+
+        float theta = atan(p_vec.x, p_vec.z);
+        float phi = asin(p_vec.y);
+
+        U = (theta+M_PI)/(2*M_PI);
+        V = (phi + (M_PI/2))/M_PI;
+
+        Kd = texture(TextureImage17, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+    }
+    else if (object_id == CHALEIRA_CILINDRICA)
+    {
+
+        float theta = atan(position_model.x, position_model.z);
+        float h = position_model.y;
+
+        U = (theta + M_PI)/(2*M_PI);
+        V = (h - bbox_min.y) / (bbox_max.y - bbox_min.y);
+
+        Kd = texture(TextureImage17, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+    }
+
 
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
