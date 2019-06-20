@@ -177,13 +177,13 @@ float g_AngleX_5 = 0.0f;
 float g_AngleY_5 = 0.0f;
 float g_AngleZ_5 = 0.0f;
 
-float g_posX_5 = -1.2*(5-1);
-float g_posY_5 = -4.8f;
-float g_posZ_5 = -11.0f;
+float g_posX_5 = 0.0f;
+float g_posY_5 = 0.0f;
+float g_posZ_5 = 0.0f;
 
-float g_scaleX_5 = 1.0f;
-float g_scaleY_5 = 1.0f;
-float g_scaleZ_5 = 1.0f;
+float g_scaleX_5 = 0.5f;
+float g_scaleY_5 = 0.5f;
+float g_scaleZ_5 = 0.5f;
 
 
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
@@ -332,7 +332,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu", "estande", "triceratop"};
+    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -538,7 +538,9 @@ int main(int argc, char* argv[])
         #define MUSEU 0
         #define ESTANDE 1
         #define DINOSSAURO 2
-        #define COELHO 3
+        #define TRIANGULO 3
+        // #define COELHO 4
+        #define VACA 4
 
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
@@ -558,11 +560,6 @@ int main(int argc, char* argv[])
         Museu.p2 = glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO);
         Museu.p3 = glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO);
         Museu.p4 = glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO);
-
-
-        //printf("Min:> x: %f :: z: %f\n", posMin.x, posMin.z);
-        //printf("Max:> x: %f :: z: %f\n\n", posMax.x, posMax.z);
-
 
 
         for (float estandes = 0; estandes<10*4; estandes+=4){
@@ -621,13 +618,30 @@ int main(int argc, char* argv[])
         }
 
         model = Matrix_Translate(-22.0f, -5.0f, 1.0f)
-              * Matrix_Scale(2.0f, 2.0f, 2.0f)
-             ;
+              * Matrix_Scale(2.0f, 2.0f, 2.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, DINOSSAURO);
         DrawVirtualObject("triceratop");
 
-        //estande 5 - 
+        //estande 4 
+        model = Matrix_Translate(posicoes_estandes[4-1].x, posicoes_estandes[4-1].y + 4.5f, posicoes_estandes[4-1].z)
+              * Matrix_Scale(0.3f, 0.3f, 0.3f)
+              * Matrix_Rotate_X((float)glfwGetTime() * 1.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, TRIANGULO);
+        DrawVirtualObject("triangulo");
+
+        //estande 5 
+        model = Matrix_Translate(posicoes_estandes[5-1].x, posicoes_estandes[5-1].y + 4.0f, posicoes_estandes[5-1].z)
+              * Matrix_Scale(g_scaleX_5, g_scaleY_5, g_scaleZ_5)
+              * Matrix_Rotate_X(g_AngleX_5)
+              * Matrix_Rotate_Y(g_AngleY_5)
+              * Matrix_Rotate_Z(g_AngleZ_5);
+
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, VACA);
+        DrawVirtualObject("cow");
+
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
@@ -673,10 +687,10 @@ int main(int argc, char* argv[])
 glm::vec4 bezier(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4)
 {
 
-    glm::vec4 p1 (p1.x, p1.y, p1.z, 1.0f);
-    glm::vec4 p2 (p2.x, p2.y, p2.z, 1.0f);
-    glm::vec4 p3 (p3.x, p3.y, p3.z, 1.0f);
-    glm::vec4 p4 (p4.x, p4.y, p4.z, 1.0f);
+    // glm::vec4 p1 (p1.x, p1.y, p1.z, 1.0f);
+    // glm::vec4 p2 (p2.x, p2.y, p2.z, 1.0f);
+    // glm::vec4 p3 (p3.x, p3.y, p3.z, 1.0f);
+    // glm::vec4 p4 (p4.x, p4.y, p4.z, 1.0f);
 
     glm::vec4 c12 = p1 + t*(p2-p1);
     glm::vec4 c23 = p2 + t*(p3-p2);
