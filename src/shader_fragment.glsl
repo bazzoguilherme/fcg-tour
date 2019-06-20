@@ -27,6 +27,8 @@ uniform mat4 projection;
 #define GALINHA 5
 #define ESFERA 6
 #define CUBO 7
+#define ROSQUINHA_1 8
+#define ROSQUINHA_2 9
 
 uniform int object_id;
 
@@ -44,6 +46,8 @@ uniform sampler2D TextureImage5;
 uniform sampler2D TextureImage6;
 uniform sampler2D TextureImage7;
 uniform sampler2D TextureImage8;
+uniform sampler2D TextureImage9;
+uniform sampler2D TextureImage10;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
@@ -184,7 +188,28 @@ void main()
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
     }
+    else if (object_id == ROSQUINHA_1)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd = texture(TextureImage8, vec2(U,V)).rgb ;
 
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        //Kd = vec3(0.640000, 0.640000, 0.640000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+    }
+    else if (object_id == ROSQUINHA_2)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd = texture(TextureImage9, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        //Kd = vec3(0.640000, 0.640000, 0.640000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+    }
 
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));

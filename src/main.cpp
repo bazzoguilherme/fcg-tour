@@ -341,7 +341,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "chicken", "esfera", "cubo"};
+    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "chicken", "esfera", "cubo", "rosquinha_1", "rosquinha_2"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -552,6 +552,8 @@ int main(int argc, char* argv[])
         #define GALINHA 5
         #define ESFERA 6
         #define CUBO 7
+        #define ROSQUINHA_1 8
+        #define ROSQUINHA_2 9
 
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
@@ -677,6 +679,20 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, CUBO);
         DrawVirtualObject("cubo");
+
+        // estande 8
+        model = Matrix_Translate(posicoes_estandes[8-1].x, posicoes_estandes[8-1].y + 4.2f, posicoes_estandes[8-1].z)
+              * Matrix_Scale(0.4f, 0.4f, 0.4f)
+              * Matrix_Rotate_X((float)glfwGetTime() * 0.3f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, ROSQUINHA_1);
+        DrawVirtualObject("rosquinha_1");
+        model = Matrix_Translate(posicoes_estandes[8-1].x, posicoes_estandes[8-1].y + 4.2f, posicoes_estandes[8-1].z)
+              * Matrix_Scale(0.4f, 0.4f, 0.4002f)
+              * Matrix_Rotate_X((float)glfwGetTime() * 0.3f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, ROSQUINHA_2);
+        DrawVirtualObject("rosquinha_2");
 
 
         // estande 9
@@ -977,6 +993,8 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage6"), 6);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage7"), 7);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage8"), 8);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage9"), 9);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage10"), 10);
     glUseProgram(0);
 }
 
