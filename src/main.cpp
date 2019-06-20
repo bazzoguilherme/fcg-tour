@@ -241,6 +241,8 @@ int estande_atual = 0;
 
 int opcao_estande1 = 0;
 
+int cor_lampada = 1;
+
 struct square_bbox{
     glm::vec3   p1;
     glm::vec3   p2;
@@ -272,6 +274,7 @@ GLint bbox_min_uniform;
 GLint bbox_max_uniform;
 GLint estande_shader;
 GLint acerto_ou_erro_est1;
+GLint cor_lampada_shader;
 
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
@@ -349,7 +352,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "chicken", "esfera", "cubo", "rosquinha_1", "rosquinha_2"};
+    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "esfera", "cubo", "rosquinha_1", "rosquinha_2", "lampada"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -361,13 +364,25 @@ int main(int argc, char* argv[])
 
         LoadTextureImage(filepath);
 
+        if(*iterator_obj_names == "estande"){
+            LoadTextureImage("../../data/estande_acerto");
+            LoadTextureImage("../../data/estande_erro");
+        } else if(*iterator_obj_names == "lampada"){
+            LoadTextureImage("../../data/vermelho");
+            LoadTextureImage("../../data/azul");
+            LoadTextureImage("../../data/verde");
+            LoadTextureImage("../../data/rosa");
+            LoadTextureImage("../../data/amarelo");
+        }
+
         ObjModel obj_model(filepath, basepath);
         ComputeNormals(&obj_model);
         BuildTrianglesAndAddToVirtualScene(&obj_model);
     }
 
-    LoadTextureImage("../../data/estande_acerto");    
-    LoadTextureImage("../../data/estande_erro");    
+
+
+
 
 
 
@@ -559,6 +574,7 @@ int main(int argc, char* argv[])
 
         glUniform1i(estande_shader, estande_atual);
         glUniform1i(acerto_ou_erro_est1, opcao_estande1);
+        glUniform1i(cor_lampada_shader, cor_lampada);
 
 
         #define MUSEU 0
@@ -566,11 +582,11 @@ int main(int argc, char* argv[])
         #define DINOSSAURO 2
         #define TRIANGULO 3
         #define VACA 4
-        #define GALINHA 5
-        #define ESFERA 6
-        #define CUBO 7
-        #define ROSQUINHA_1 8
-        #define ROSQUINHA_2 9
+        #define ESFERA 5
+        #define CUBO 6
+        #define ROSQUINHA_1 7
+        #define ROSQUINHA_2 8
+        #define LAMPADA 9
 
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
@@ -729,7 +745,7 @@ int main(int argc, char* argv[])
         p3X_9 = posicoes_estandes[9-1].x - 0.2f;
         p3Y_9 = posicoes_estandes[9-1].y + 4.7f;
         p3Z_9 = posicoes_estandes[9-1].z - 0.3f;
-        
+
 
         p4X_9 = posicoes_estandes[9-1].x - 0.5f;
         p4Y_9 = posicoes_estandes[9-1].y + 4.2f;
@@ -750,6 +766,14 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, VACA);
         DrawVirtualObject("cow");
 
+
+        // estande 10
+        model = Matrix_Translate(posicoes_estandes[10-1].x, posicoes_estandes[10-1].y + 3.65f, posicoes_estandes[10-1].z + 0.2f)
+              * Matrix_Scale(2.6f, 2.6f, 2.6f)
+              * Matrix_Rotate_X(-1.2f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, LAMPADA);
+        DrawVirtualObject("lampada");
 
         // estande 13
         model = Matrix_Translate(posicoes_estandes[13-1].x, posicoes_estandes[13-1].y + 4.2f, posicoes_estandes[13-1].z)
@@ -1021,6 +1045,7 @@ void LoadShadersFromFiles()
 
     estande_shader = glGetUniformLocation(program_id, "estande_atual");
     acerto_ou_erro_est1 = glGetUniformLocation(program_id, "acerto_ou_erro_est1");
+    cor_lampada_shader = glGetUniformLocation(program_id, "cor_lampada");
 
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
@@ -1042,8 +1067,9 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage14"), 14);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage15"), 15);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage16"), 16);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage17"), 17);
 
-    
+
     glUseProgram(0);
 }
 
@@ -1705,6 +1731,26 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_2 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 1-1){
         opcao_estande1 = 2;
     }
+
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 10-1){
+        cor_lampada = 1;
+    }
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 10-1){
+        cor_lampada = 2;
+    }
+    if (key == GLFW_KEY_3 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 10-1){
+        cor_lampada = 3;
+    }
+    if (key == GLFW_KEY_4 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 10-1){
+        cor_lampada = 4;
+    }
+    if (key == GLFW_KEY_5 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 10-1){
+        cor_lampada = 5;
+    }
+    if (key == GLFW_KEY_6 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 10-1){
+        cor_lampada = 6;
+    }
+
 
 
     // TECLAS W/S/D/A

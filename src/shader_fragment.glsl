@@ -24,11 +24,11 @@ uniform mat4 projection;
 #define DINOSSAURO 2
 #define TRIANGULO 3
 #define VACA 4
-#define GALINHA 5
-#define ESFERA 6
-#define CUBO 7
-#define ROSQUINHA_1 8
-#define ROSQUINHA_2 9
+#define ESFERA 5
+#define CUBO 6
+#define ROSQUINHA_1 7
+#define ROSQUINHA_2 8
+#define LAMPADA 9
 
 uniform int object_id;
 
@@ -54,10 +54,12 @@ uniform sampler2D TextureImage13;
 uniform sampler2D TextureImage14;
 uniform sampler2D TextureImage15;
 uniform sampler2D TextureImage16;
+uniform sampler2D TextureImage17;
 
 
 uniform int estande_atual = 0;
 uniform int acerto_ou_erro_est1 = 0;
+uniform int cor_lampada = 1;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
@@ -122,15 +124,15 @@ void main()
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
 
-    } else if ( object_id == ESTANDE )
+    } else if ( object_id == ESTANDE)
     {
         U = texcoords.x;
         V = texcoords.y;
 
         if ( acerto_ou_erro_est1 == 1){
-            Kd = texture(TextureImage10, vec2(U,V)).rgb ;
+            Kd = texture(TextureImage2, vec2(U,V)).rgb ;
         } else if ( acerto_ou_erro_est1 == 2){
-            Kd = texture(TextureImage11, vec2(U,V)).rgb ;
+            Kd = texture(TextureImage3, vec2(U,V)).rgb ;
         } else {
             Kd = texture(TextureImage1, vec2(U,V)).rgb ;
         }
@@ -143,7 +145,7 @@ void main()
     {
         U = texcoords.x;
         V = texcoords.y;
-        Kd = texture(TextureImage2, vec2(U,V)).rgb ;
+        Kd = texture(TextureImage4, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
         //Kd = vec3(0.640000, 0.640000, 0.640000);
@@ -155,7 +157,7 @@ void main()
     {
         U = texcoords.x;
         V = texcoords.y;
-        Kd = texture(TextureImage3, vec2(U,V)).rgb ;
+        Kd = texture(TextureImage5, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
         //Kd = vec3(0.640000, 0.640000, 0.640000);
@@ -166,45 +168,24 @@ void main()
     {
         U = texcoords.x;
         V = texcoords.y;
-        Kd = texture(TextureImage4, vec2(U,V)).rgb ;
-
-        Ka = vec3(1.000000, 1.000000, 1.000000);
-        //Kd = vec3(0.640000, 0.640000, 0.640000);
-        Ks = vec3(0.500000, 0.500000, 0.500000);
-        q = 20.0;
-    }
-    else if (object_id == GALINHA)
-    {
-        U = texcoords.x;
-        V = texcoords.y;
-        Kd = texture(TextureImage5, vec2(U,V)).rgb ;
-
-        Ka = vec3(1.000000, 1.000000, 1.000000);
-        //Kd = vec3(0.640000, 0.640000, 0.640000);
-        Ks = vec3(0.500000, 0.500000, 0.500000);
-        q = 20.0;
-    } else if (object_id == ESFERA)
-    {
-        U = texcoords.x;
-        V = texcoords.y;
         Kd = texture(TextureImage6, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        Ks = vec3(0.8, 0.8, 0.8);
-        q = 100.0;
+        //Kd = vec3(0.640000, 0.640000, 0.640000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
     }
-    else if (object_id == CUBO)
+    else if (object_id == ESFERA)
     {
         U = texcoords.x;
         V = texcoords.y;
         Kd = texture(TextureImage7, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        //Kd = vec3(0.640000, 0.640000, 0.640000);
-        Ks = vec3(0.500000, 0.500000, 0.500000);
-        q = 20.0;
+        Ks = vec3(0.8, 0.8, 0.8);
+        q = 100.0;
     }
-    else if (object_id == ROSQUINHA_1)
+    else if (object_id == CUBO)
     {
         U = texcoords.x;
         V = texcoords.y;
@@ -215,11 +196,45 @@ void main()
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
     }
-    else if (object_id == ROSQUINHA_2)
+    else if (object_id == ROSQUINHA_1)
     {
         U = texcoords.x;
         V = texcoords.y;
         Kd = texture(TextureImage9, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        //Kd = vec3(0.640000, 0.640000, 0.640000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+    }
+    else if (object_id == ROSQUINHA_2)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd = texture(TextureImage10, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        //Kd = vec3(0.640000, 0.640000, 0.640000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+    }
+    else if (object_id == LAMPADA)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        if( cor_lampada == 1 )
+            Kd = texture(TextureImage11, vec2(U,V)).rgb ;
+        else if (cor_lampada == 2)
+            Kd = texture(TextureImage12, vec2(U,V)).rgb ;
+        else if (cor_lampada == 3)
+            Kd = texture(TextureImage13, vec2(U,V)).rgb ;
+        else if (cor_lampada == 4)
+            Kd = texture(TextureImage14, vec2(U,V)).rgb ;
+        else if (cor_lampada == 5)
+            Kd = texture(TextureImage15, vec2(U,V)).rgb ;
+        else if (cor_lampada == 6)
+            Kd = texture(TextureImage16, vec2(U,V)).rgb ;
+
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
         //Kd = vec3(0.640000, 0.640000, 0.640000);
