@@ -490,7 +490,7 @@ int main(int argc, char* argv[])
             camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.2f, posicoes_estandes[estande_atual].z, 1.0f);
             // Vetor "view", sentido para onde a câmera está virada
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
-            printf("x = %f, y = %f, z = %f\n", posicoes_estandes[estande_atual].x,posicoes_estandes[estande_atual].y,posicoes_estandes[estande_atual].z );
+            //printf("x = %f, y = %f, z = %f\n", posicoes_estandes[estande_atual].x,posicoes_estandes[estande_atual].y,posicoes_estandes[estande_atual].z );
         }
 
         camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
@@ -623,7 +623,7 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, DINOSSAURO);
         DrawVirtualObject("triceratop");
 
-        //estande 4 
+        //estande 4
         model = Matrix_Translate(posicoes_estandes[4-1].x, posicoes_estandes[4-1].y + 4.5f, posicoes_estandes[4-1].z)
               * Matrix_Scale(0.3f, 0.3f, 0.3f)
               * Matrix_Rotate_X((float)glfwGetTime() * 1.0f);
@@ -631,7 +631,7 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, TRIANGULO);
         DrawVirtualObject("triangulo");
 
-        //estande 5 
+        //estande 5
         model = Matrix_Translate(posicoes_estandes[5-1].x, posicoes_estandes[5-1].y + 4.0f, posicoes_estandes[5-1].z)
               * Matrix_Scale(g_scaleX_5, g_scaleY_5, g_scaleZ_5)
               * Matrix_Rotate_X(g_AngleX_5)
@@ -1627,7 +1627,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             g_AngleX_5 = 0.0f;
             g_AngleY_5 = 0.0f;
             g_AngleZ_5 = 0.0f;
-            
+
             g_posX_5 = 0.0f;
             g_posY_5 = 0.0f;
             g_posZ_5 = 0.0f;
