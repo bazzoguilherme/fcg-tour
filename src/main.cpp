@@ -1606,6 +1606,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         else
             glfwSetWindowShouldClose(window, GL_TRUE);
     }
+
+    if (key == GLFW_KEY_ENTER && action == GLFW_PRESS){
+        load_look_at_camera();
+    }
+
     // O código abaixo implementa a seguinte lógica:
     //   Se apertar tecla X       então g_AngleX += delta;
     //   Se apertar tecla shift+X então g_AngleX -= delta;
@@ -1678,10 +1683,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     // Atual controle sobre qual camera usar
     if (key == GLFW_KEY_1 && action == GLFW_PRESS){
-        load_free_camera();
+        
     }
     if (key == GLFW_KEY_2 && action == GLFW_PRESS){
-        load_look_at_camera();
+        
     }
 
 
