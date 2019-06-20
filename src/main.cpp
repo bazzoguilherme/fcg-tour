@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu", "estande", "triceratop"};
+    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -521,6 +521,8 @@ int main(int argc, char* argv[])
         #define ESTANDE 1
         #define DINOSSAURO 2
 
+        #define TRIANGULO 3
+
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
@@ -539,11 +541,6 @@ int main(int argc, char* argv[])
         Museu.p2 = glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO);
         Museu.p3 = glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO);
         Museu.p4 = glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO);
-
-
-        //printf("Min:> x: %f :: z: %f\n", posMin.x, posMin.z);
-        //printf("Max:> x: %f :: z: %f\n\n", posMax.x, posMax.z);
-
 
 
         for (float estandes = 0; estandes<10*4; estandes+=4){
@@ -602,11 +599,18 @@ int main(int argc, char* argv[])
         }
 
         model = Matrix_Translate(-22.0f, -5.0f, 1.0f)
-              * Matrix_Scale(2.0f, 2.0f, 2.0f)
-             ;
+              * Matrix_Scale(2.0f, 2.0f, 2.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, DINOSSAURO);
         DrawVirtualObject("triceratop");
+
+        model = Matrix_Translate(posicoes_estandes[6-1].x, posicoes_estandes[6-1].y + 4.5f, posicoes_estandes[6-1].z)
+              * Matrix_Scale(0.3f, 0.3f, 0.3f)
+              * Matrix_Rotate_X((float)glfwGetTime() * 1.0f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, TRIANGULO);
+        DrawVirtualObject("triangulo");
+
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
