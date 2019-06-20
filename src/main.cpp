@@ -652,6 +652,17 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, VACA);
         DrawVirtualObject("cow");
 
+        // estande 6
+        model = Matrix_Translate(posicoes_estandes[6-1].x, posicoes_estandes[6-1].y + 4.2f, posicoes_estandes[6-1].z)
+              * Matrix_Scale(0.3f, 0.3f, 0.3f)
+              * Matrix_Rotate_Z(g_AngleZ)
+              * Matrix_Rotate_Y(g_AngleY)
+              * Matrix_Rotate_X(g_AngleX);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, CUBO);
+        DrawVirtualObject("cubo");
+
+
         // estande 7
         model = Matrix_Translate(posicoes_estandes[7-1].x + 0.2f, posicoes_estandes[7-1].y + 4.0f, posicoes_estandes[7-1].z + 0.3f)
               * Matrix_Scale(0.25f, 0.25f, 0.25f)
@@ -1555,22 +1566,28 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     float delta = M_PI / 16; // 22.5 graus, em radianos.
 
-    // if (key == GLFW_KEY_X && action == GLFW_PRESS)
-    // {
-    //     g_AngleX += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
-    // }
+    if (key == GLFW_KEY_X && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 6-1)
+    {
+        g_AngleX += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+    }
 
-    // if (key == GLFW_KEY_Y && action == GLFW_PRESS)
-    // {
-    //     g_AngleY += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
-    // }
-    // if (key == GLFW_KEY_Z && action == GLFW_PRESS)
-    // {
-    //     g_AngleZ += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
-    // }
+    if (key == GLFW_KEY_Y && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 6-1)
+    {
+        g_AngleY += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+    }
+    //Set gimbal lock
+    if (key == GLFW_KEY_G && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 6-1)
+    {
+        g_AngleY = M_PI/2;
+    }
+
+    if (key == GLFW_KEY_Z && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 6-1)
+    {
+        g_AngleZ += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+    }
 
     // Se o usuário apertar a tecla espaço, resetamos os ângulos de Euler para zero.
-    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 6-1 )
     {
         g_AngleX = 0.0f;
         g_AngleY = 0.0f;
