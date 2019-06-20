@@ -269,6 +269,78 @@ void main()
     else if (object_id == CHALEIRA_CUBICA)
     {
 
+        float x = position_model.x;
+        float y = position_model.y;
+        float z = position_model.z;
+
+        float absX = abs(x);
+        float absY = abs(y);
+        float absZ = abs(z);
+
+        bool isXPositive = (x > 0) ? true : false;
+        bool isYPositive = (y > 0) ? true : false;
+        bool isZPositive = (z > 0) ? true : false;
+
+        float maxAxis, uc, vc;
+
+        // POSITIVE X
+        if ((isXPositive) && (absX >= absY) && (absX >= absZ)) {
+        // u (0 to 1) goes from +z to -z
+        // v (0 to 1) goes from -y to +y
+        maxAxis = absX;
+        uc = -z;
+        vc = y;
+        }
+        // NEGATIVE X
+        if ((!(isXPositive)) && (absX >= absY) && (absX >= absZ)) {
+        // u (0 to 1) goes from -z to +z
+        // v (0 to 1) goes from -y to +y
+        maxAxis = absX;
+        uc = z;
+        vc = y;
+        }
+        // POSITIVE Y
+        if ((isYPositive) && (absY >= absX) && (absY >= absZ)) {
+        // u (0 to 1) goes from -x to +x
+        // v (0 to 1) goes from +z to -z
+        maxAxis = absY;
+        uc = x;
+        vc = -z;
+        }
+        // NEGATIVE Y
+        if ((!(isYPositive)) && (absY >= absX) && (absY >= absZ)) {
+        // u (0 to 1) goes from -x to +x
+        // v (0 to 1) goes from -z to +z
+        maxAxis = absY;
+        uc = x;
+        vc = z;
+        }
+        // POSITIVE Z
+        if ((isZPositive) && (absZ >= absX) && (absZ >= absY)) {
+        // u (0 to 1) goes from -x to +x
+        // v (0 to 1) goes from -y to +y
+        maxAxis = absZ;
+        uc = x;
+        vc = y;
+        }
+        // NEGATIVE Z
+        if ((!(isZPositive)) && (absZ >= absX) && (absZ >= absY)) {
+        // u (0 to 1) goes from +x to -x
+        // v (0 to 1) goes from -y to +y
+        maxAxis = absZ;
+        uc = -x;
+        vc = y;
+        }
+
+        // Convert range from -1 to 1 to 0 to 1
+        U = 0.5f * (uc / maxAxis + 1.0f);
+        V = 0.5f * (vc / maxAxis + 1.0f);
+
+        Kd = texture(TextureImage17, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
     }
     else if (object_id == CHALEIRA_ESFERICA)
     {
