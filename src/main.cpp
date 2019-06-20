@@ -633,9 +633,9 @@ int main(int argc, char* argv[])
         DrawVirtualObject("triceratop");
 
         // estande 4
-        model = Matrix_Translate(posicoes_estandes[4-1].x, posicoes_estandes[4-1].y + 4.0f, posicoes_estandes[4-1].z)
-              * Matrix_Scale(0.3f, 0.3f, 0.3f)
-              * Matrix_Rotate_X((float)glfwGetTime() * 1.0f);
+        model = Matrix_Translate(posicoes_estandes[4-1].x, posicoes_estandes[4-1].y + 4.2f, posicoes_estandes[4-1].z)
+              * Matrix_Scale(0.2f, 0.2f, 0.2f)
+              * Matrix_Rotate_X((float)glfwGetTime() * 1.5f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, TRIANGULO);
         DrawVirtualObject("triangulo");
