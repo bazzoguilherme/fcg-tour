@@ -239,6 +239,8 @@ float x;
 std::vector<glm::vec4> posicoes_estandes;
 int estande_atual = 0;
 
+int opcao_estande1 = 0;
+
 struct square_bbox{
     glm::vec3   p1;
     glm::vec3   p2;
@@ -269,6 +271,7 @@ GLint object_id_uniform;
 GLint bbox_min_uniform;
 GLint bbox_max_uniform;
 GLint estande_shader;
+GLint acerto_ou_erro_est1;
 
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
@@ -362,6 +365,11 @@ int main(int argc, char* argv[])
         ComputeNormals(&obj_model);
         BuildTrianglesAndAddToVirtualScene(&obj_model);
     }
+
+    LoadTextureImage("../../data/estande_acerto");    
+    LoadTextureImage("../../data/estande_erro");    
+
+
 
     if ( argc > 1 )
     {
@@ -550,6 +558,8 @@ int main(int argc, char* argv[])
 
 
         glUniform1i(estande_shader, estande_atual);
+        glUniform1i(acerto_ou_erro_est1, opcao_estande1);
+
 
         #define MUSEU 0
         #define ESTANDE 1
@@ -1010,6 +1020,7 @@ void LoadShadersFromFiles()
     bbox_max_uniform        = glGetUniformLocation(program_id, "bbox_max");
 
     estande_shader = glGetUniformLocation(program_id, "estande_atual");
+    acerto_ou_erro_est1 = glGetUniformLocation(program_id, "acerto_ou_erro_est1");
 
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
@@ -1025,6 +1036,12 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage8"), 8);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage9"), 9);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage10"), 10);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage11"), 11);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage12"), 12);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage13"), 13);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage14"), 14);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage15"), 15);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage16"), 16);
 
     
     glUseProgram(0);
@@ -1682,11 +1699,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
 
     // Atual controle sobre qual camera usar
-    if (key == GLFW_KEY_1 && action == GLFW_PRESS){
-        
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 1-1){
+        opcao_estande1 = 1;
     }
-    if (key == GLFW_KEY_2 && action == GLFW_PRESS){
-        
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 1-1){
+        opcao_estande1 = 2;
     }
 
 

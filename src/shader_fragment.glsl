@@ -48,9 +48,16 @@ uniform sampler2D TextureImage7;
 uniform sampler2D TextureImage8;
 uniform sampler2D TextureImage9;
 uniform sampler2D TextureImage10;
+uniform sampler2D TextureImage11;
+uniform sampler2D TextureImage12;
+uniform sampler2D TextureImage13;
+uniform sampler2D TextureImage14;
+uniform sampler2D TextureImage15;
+uniform sampler2D TextureImage16;
 
 
 uniform int estande_atual = 0;
+uniform int acerto_ou_erro_est1 = 0;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
@@ -119,8 +126,14 @@ void main()
     {
         U = texcoords.x;
         V = texcoords.y;
-        Kd = texture(TextureImage1, vec2(U,V)).rgb ;
 
+        if ( acerto_ou_erro_est1 == 1){
+            Kd = texture(TextureImage10, vec2(U,V)).rgb ;
+        } else if ( acerto_ou_erro_est1 == 2){
+            Kd = texture(TextureImage11, vec2(U,V)).rgb ;
+        } else {
+            Kd = texture(TextureImage1, vec2(U,V)).rgb ;
+        }
         Ka = vec3(1.000000, 1.000000, 1.000000);
         //Kd = vec3(0.640000, 0.640000, 0.640000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
