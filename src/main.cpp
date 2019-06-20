@@ -188,12 +188,16 @@ float g_scaleZ_5 = 0.5f;
 // definições dos pontos para a curva do estande 9
 float p1X_9 = 0.1f;
 float p1Y_9 = 0.1f;
+float p1Z_9 = 0.1f;
 float p2X_9 = 0.5f;
 float p2Y_9 = 0.5f;
+float p2Z_9 = 0.1f;
 float p3X_9 = 1.3f;
 float p3Y_9 = 1.3f;
+float p3Z_9 = 0.1f;
 float p4X_9 = 1.4f;
 float p4Y_9 = 1.4f;
+float p4Z_9 = 0.1f;
 
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
 // pressionado no momento atual. Veja função MouseButtonCallback().
@@ -696,19 +700,39 @@ int main(int argc, char* argv[])
 
 
         // estande 9
-        float t_bezier = cos(time_now);
+        // normalizando valores que inicialmente iam de [-1, 1] (como faz o cosseno)
+        //      para [0,1]
+        float t_bezier = ( cos(time_now) - (-1) )/(1 - (-1)) ;
 
-        glm::vec4 p1 (0.0f, p1Y_9, p1X_9, 1.0f);
-        glm::vec4 p2 (0.0f, p2Y_9, p2X_9, 1.0f);
-        glm::vec4 p3 (0.0f, p3Y_9, p3X_9, 1.0f);
-        glm::vec4 p4 (0.0f, p4Y_9, p4X_9, 1.0f);
+         // necessário ajustar valores
+        p1X_9 = posicoes_estandes[9-1].x + 0.6f;
+        p1Y_9 = posicoes_estandes[9-1].y + 4.0f;
+        p1Z_9 = posicoes_estandes[9-1].z + 0.5f;
+
+        p2X_9 = posicoes_estandes[9-1].x + 0.2f;
+        p2Y_9 = posicoes_estandes[9-1].y + 4.5f;
+        p2Z_9 = posicoes_estandes[9-1].z + 0.2f;
+
+        p3X_9 = posicoes_estandes[9-1].x - 0.2f;
+        p3Y_9 = posicoes_estandes[9-1].y + 4.7f;
+        p3Z_9 = posicoes_estandes[9-1].z - 0.3f;
+        
+
+        p4X_9 = posicoes_estandes[9-1].x - 0.5f;
+        p4Y_9 = posicoes_estandes[9-1].y + 4.2f;
+        p4Z_9 = posicoes_estandes[9-1].z - 0.5f;
+
+        glm::vec4 p1 (p1X_9, p1Y_9, p1Z_9, 1.0f);
+        glm::vec4 p2 (p2X_9, p2Y_9, p2Z_9, 1.0f);
+        glm::vec4 p3 (p3X_9, p3Y_9, p3Z_9, 1.0f);
+        glm::vec4 p4 (p4X_9, p4Y_9, p4Z_9, 1.0f);
 
         glm::vec4 deslocamento_9 = bezier(t_bezier, p1, p2, p3, p4);
 
         //printf("x = %f y = %f z = %f\n", deslocamento_9.x, deslocamento_9.y, deslocamento_9.z);
 
-        model = Matrix_Translate(posicoes_estandes[9-1].x - 2.0f + deslocamento_9.x, posicoes_estandes[9-1].y + 4.0f - 2.0f + deslocamento_9.y, posicoes_estandes[9-1].z)
-              * Matrix_Scale(0.5f, 0.5f, 0.5f);
+        model = Matrix_Translate(deslocamento_9.x, deslocamento_9.y, deslocamento_9.z)
+              * Matrix_Scale(0.3f, 0.3f, 0.3f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, VACA);
         DrawVirtualObject("cow");
@@ -775,9 +799,9 @@ glm::vec4 bezier(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4
     glm::vec4 c34 = p3 + t*(p4-p3);
     glm::vec4 c123 = c12 + t*(c23-c12);
     glm::vec4 c234 = c23 + t*(c34-c23);
-    glm::vec4 y = c123 + t*(c234-c123);
+    glm::vec4 c = c123 + t*(c234-c123);
 
-    return y;
+    return c;
 }
 
 template <typename T> int sgn(T val) {
