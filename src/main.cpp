@@ -472,6 +472,7 @@ int main(int argc, char* argv[])
             camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.2f, posicoes_estandes[estande_atual].z, 1.0f);
             // Vetor "view", sentido para onde a câmera está virada
             camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
+            printf("x = %f, y = %f, z = %f\n", posicoes_estandes[estande_atual].x,posicoes_estandes[estande_atual].y,posicoes_estandes[estande_atual].z );
         }
 
         camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
@@ -607,6 +608,7 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, DINOSSAURO);
         DrawVirtualObject("triceratop");
 
+
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
         // matrizes the_model, the_view, e the_projection; e escrevemos na tela
@@ -645,6 +647,24 @@ int main(int argc, char* argv[])
 
     // Fim do programa
     return 0;
+}
+
+glm::vec4 bezier(float t, glm::vec4 a, glm::vec4 b, glm::vec4 c, glm::vec4 d)
+{
+
+    glm::vec4 p1 (a.x, a.y, a.z, 1.0f);
+    glm::vec4 p2 (b.x, b.y, b.z, 1.0f);
+    glm::vec4 p3 (c.x, c.y, c.z, 1.0f);
+    glm::vec4 p4 (d.x, d.y, d.z, 1.0f);
+
+    glm::vec4 c12 = p1 + t*(p2-p1);
+    glm::vec4 c23 = p2 + t*(p3-p2);
+    glm::vec4 c34 = p3 + t*(p4-p3);
+    glm::vec4 c123 = c12 + t*(c23-c12);
+    glm::vec4 c234 = c23 + t*(c34-c23);
+    glm::vec4 y = c123 + t*(c234-c123);
+
+    return y;
 }
 
 template <typename T> int sgn(T val) {
