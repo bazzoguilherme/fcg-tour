@@ -22,6 +22,10 @@ uniform mat4 projection;
 #define MUSEU 0
 #define ESTANDE 1
 #define DINOSSAURO 2
+#define TRIANGULO 3
+#define VACA 4
+#define GALINHA 5
+
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -32,6 +36,9 @@ uniform vec4 bbox_max;
 uniform sampler2D TextureImage0;
 uniform sampler2D TextureImage1;
 uniform sampler2D TextureImage2;
+uniform sampler2D TextureImage3;
+uniform sampler2D TextureImage4;
+uniform sampler2D TextureImage5;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
@@ -119,6 +126,40 @@ void main()
         q = 20.0;
 
     }
+    else if (object_id == TRIANGULO)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd = texture(TextureImage3, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        //Kd = vec3(0.640000, 0.640000, 0.640000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+    }
+    else if (object_id == VACA)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd = texture(TextureImage4, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        //Kd = vec3(0.640000, 0.640000, 0.640000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;      
+    }
+    else if (object_id == GALINHA)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd = texture(TextureImage5, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        //Kd = vec3(0.640000, 0.640000, 0.640000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+    }
+
 
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
