@@ -341,7 +341,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "chicken"};
+    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "chicken", "esfera"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -550,6 +550,7 @@ int main(int argc, char* argv[])
         #define TRIANGULO 3
         #define VACA 4
         #define GALINHA 5
+        #define ESFERA 6
 
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
@@ -667,6 +668,14 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, VACA);
         DrawVirtualObject("cow");
+
+
+        // estande 13
+        model = Matrix_Translate(posicoes_estandes[13-1].x, posicoes_estandes[13-1].y + 4.2f, posicoes_estandes[13-1].z)
+              * Matrix_Scale(0.5f, 0.5f, 0.5f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, ESFERA);
+        DrawVirtualObject("esfera");
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
@@ -936,7 +945,6 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage3"), 3);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage4"), 4);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage5"), 5);
-    glUniform1i(glGetUniformLocation(program_id, "TextureImage6"), 6);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage6"), 6);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage7"), 7);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage8"), 8);

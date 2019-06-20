@@ -25,6 +25,7 @@ uniform mat4 projection;
 #define TRIANGULO 3
 #define VACA 4
 #define GALINHA 5
+#define ESFERA 6
 
 uniform int object_id;
 
@@ -39,6 +40,9 @@ uniform sampler2D TextureImage2;
 uniform sampler2D TextureImage3;
 uniform sampler2D TextureImage4;
 uniform sampler2D TextureImage5;
+uniform sampler2D TextureImage6;
+uniform sampler2D TextureImage7;
+uniform sampler2D TextureImage8;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
@@ -146,7 +150,7 @@ void main()
         Ka = vec3(1.000000, 1.000000, 1.000000);
         //Kd = vec3(0.640000, 0.640000, 0.640000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
-        q = 20.0;      
+        q = 20.0;
     }
     else if (object_id == GALINHA)
     {
@@ -158,6 +162,15 @@ void main()
         //Kd = vec3(0.640000, 0.640000, 0.640000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
+    } else if (object_id == ESFERA)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd = texture(TextureImage6, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        Ks = vec3(0.8, 0.8, 0.8);
+        q = 100.0;
     }
 
 
@@ -183,7 +196,7 @@ void main()
     vec3 phong_specular_term  = Ks*I*pow(max(0.0, dot(r,v)),q);
 
     // Cor final do fragmento calculada com uma combinação dos termos difuso, especular, e ambiente.
-    if(dot((normalize(p - spotlightPosition)), normalize(spotlightDirection)) < cos(M_PI/2.5)) //60 graus
+    if(dot((normalize(p - spotlightPosition)), normalize(spotlightDirection)) < cos(M_PI/2.5)) // graus
         color = lambert_color;
     else
         color = lambert_diffuse_term + ambient_term + phong_specular_term ;
