@@ -652,15 +652,15 @@ int main(int argc, char* argv[])
 
         // estande 9
         float t_bezier = cos(time_now);
-        
+
         glm::vec4 p1 (0.0f, p1Y_9, p1Z_9, 1.0f);
         glm::vec4 p2 (0.0f, p2Y_9, p2Z_9, 1.0f);
         glm::vec4 p3 (0.0f, p3Y_9, p3Z_9, 1.0f);
         glm::vec4 p4 (0.0f, p4Y_9, p4Z_9, 1.0f);
 
         glm::vec4 deslocamento_9 = bezier(t_bezier, p1, p2, p3, p4);
-        
-        model = model = Matrix_Translate(posicoes_estandes[9-1].x, posicoes_estandes[9-1].y + 4.0f/* - 2.0f + deslocamento_9.y*/, posicoes_estandes[9-1].z /*- 2.0f + deslocamento_9.z*/)
+
+        model = Matrix_Translate(posicoes_estandes[9-1].x, posicoes_estandes[9-1].y + 4.0f/* - 2.0f + deslocamento_9.y*/, posicoes_estandes[9-1].z /*- 2.0f + deslocamento_9.z*/)
               * Matrix_Scale(1.0f, 1.0f, 1.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, GALINHA);
@@ -931,6 +931,13 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage0"), 0);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage1"), 1);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage2"), 2);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage3"), 3);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage4"), 4);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage5"), 5);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage6"), 6);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage6"), 6);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage7"), 7);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage8"), 8);
     glUseProgram(0);
 }
 
@@ -1712,7 +1719,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         {
             p4Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
         }
-        
+
 
         if ((key == GLFW_KEY_SPACE || key == GLFW_KEY_ESCAPE) && action == GLFW_PRESS)
         {
