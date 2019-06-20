@@ -341,7 +341,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "frog"};
+    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "chicken"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -549,7 +549,7 @@ int main(int argc, char* argv[])
         #define DINOSSAURO 2
         #define TRIANGULO 3
         #define VACA 4
-        #define SAPO 5
+        #define GALINHA 5
 
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
@@ -663,8 +663,8 @@ int main(int argc, char* argv[])
         model = model = Matrix_Translate(posicoes_estandes[9-1].x, posicoes_estandes[9-1].y + 4.0f - 2.0f + deslocamento_9.y, posicoes_estandes[9-1].z - 2.0f + deslocamento_9.z)
               * Matrix_Scale(1.0f, 1.0f, 1.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, SAPO);
-        DrawVirtualObject("frog");
+        glUniform1i(object_id_uniform, GALINHA);
+        DrawVirtualObject("chicken");
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
