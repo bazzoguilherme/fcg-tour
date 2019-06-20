@@ -1471,11 +1471,24 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     // Se o usuário pressionar a tecla ESC, fechamos a janela.
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    {
+        g_AngleX_5 = 0.0f;
+        g_AngleY_5 = 0.0f;
+        g_AngleZ_5 = 0.0f;
+
+        g_posX_5 = 0.0f;
+        g_posY_5 = 0.0f;
+        g_posZ_5 = 0.0f;
+
+        g_scaleX_5 = 0.5f;
+        g_scaleY_5 = 0.5f;
+        g_scaleZ_5 = 0.5f;
+
         if (camera_view_ID == LOOK_AT_CAMERA)
             load_free_camera();
         else
             glfwSetWindowShouldClose(window, GL_TRUE);
-
+    }
     // O código abaixo implementa a seguinte lógica:
     //   Se apertar tecla X       então g_AngleX += delta;
     //   Se apertar tecla shift+X então g_AngleX -= delta;
@@ -1581,7 +1594,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     // Ações específicas para cada estande
     // se estande 5
-    if (estande_atual == 5-1)
+    if (estande_atual == 5-1 && camera_view_ID == 2)
     {
         if (key == GLFW_KEY_X && action == GLFW_PRESS)
         {
@@ -1622,7 +1635,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             g_scaleZ_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
         }
 
-        if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+        if ((key == GLFW_KEY_SPACE || key == GLFW_KEY_ESCAPE) && action == GLFW_PRESS)
         {
             g_AngleX_5 = 0.0f;
             g_AngleY_5 = 0.0f;
@@ -1632,9 +1645,9 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             g_posY_5 = 0.0f;
             g_posZ_5 = 0.0f;
 
-            g_scaleX_5 = 0.0f;
-            g_scaleY_5 = 0.0f;
-            g_scaleZ_5 = 0.0f;
+            g_scaleX_5 = 0.5f;
+            g_scaleY_5 = 0.5f;
+            g_scaleZ_5 = 0.5f;
         }
     }
 }
