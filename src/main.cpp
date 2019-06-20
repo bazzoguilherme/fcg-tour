@@ -171,7 +171,6 @@ float g_AngleX = 0.0f;
 float g_AngleY = 0.0f;
 float g_AngleZ = 0.0f;
 
-
 // definições das informações do objeto no estande 5
 float g_AngleX_5 = 0.0f;
 float g_AngleY_5 = 0.0f;
@@ -185,6 +184,15 @@ float g_scaleX_5 = 0.5f;
 float g_scaleY_5 = 0.5f;
 float g_scaleZ_5 = 0.5f;
 
+// definições dos pontos para a curva do estande 9
+float p1X_9 = 0.0f;
+float p1Y_9 = 0.0f;
+float p2X_9 = 0.0f;
+float p2Y_9 = 0.0f;
+float p3X_9 = 0.0f;
+float p3Y_9 = 0.0f;
+float p4X_9 = 0.0f;
+float p4Y_9 = 0.0f;
 
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
 // pressionado no momento atual. Veja função MouseButtonCallback().
@@ -332,7 +340,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow"};
+    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "frog"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -385,7 +393,7 @@ int main(int argc, char* argv[])
         // Controle do tempo no movimento para reposicionamento da câmera com WASD keys
         time_now = glfwGetTime();
         passo_tempo = (time_now - time_prev);
-        double passo_camera = passo_tempo*3.0f;
+        double passo_camera = passo_tempo*4.0f;
         time_prev = time_now;
 
         // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
@@ -539,8 +547,8 @@ int main(int argc, char* argv[])
         #define ESTANDE 1
         #define DINOSSAURO 2
         #define TRIANGULO 3
-        // #define COELHO 4
         #define VACA 4
+        #define SAPO 5
 
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
@@ -624,7 +632,7 @@ int main(int argc, char* argv[])
         DrawVirtualObject("triceratop");
 
         // estande 4
-        model = Matrix_Translate(posicoes_estandes[4-1].x, posicoes_estandes[4-1].y + 4.5f, posicoes_estandes[4-1].z)
+        model = Matrix_Translate(posicoes_estandes[4-1].x, posicoes_estandes[4-1].y + 4.0f, posicoes_estandes[4-1].z)
               * Matrix_Scale(0.3f, 0.3f, 0.3f)
               * Matrix_Rotate_X((float)glfwGetTime() * 1.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
@@ -640,6 +648,13 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, VACA);
         DrawVirtualObject("cow");
+
+        // estande 9
+        model = model = Matrix_Translate(posicoes_estandes[9-1].x, posicoes_estandes[9-1].y + 4.0f, posicoes_estandes[9-1].z)
+              * Matrix_Scale(0.3f, 0.3f, 0.3f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, SAPO);
+        DrawVirtualObject("frog");
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
@@ -1630,6 +1645,64 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         {
             g_scaleZ_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
         }
+
+        if ((key == GLFW_KEY_SPACE || key == GLFW_KEY_ESCAPE) && action == GLFW_PRESS)
+        {
+            g_AngleX_5 = 0.0f;
+            g_AngleY_5 = 0.0f;
+            g_AngleZ_5 = 0.0f;
+
+            g_posX_5 = 0.0f;
+            g_posY_5 = 0.0f;
+            g_posZ_5 = 0.0f;
+
+            g_scaleX_5 = 0.5f;
+            g_scaleY_5 = 0.5f;
+            g_scaleZ_5 = 0.5f;
+        }
+    }
+
+    float delta_9 = 0.5f;
+        // se estande 9
+    if (estande_atual == 9-1 && camera_view_ID == 2)
+    {
+        // P1
+        if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+        {
+            p1X_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+        }
+        if (key == GLFW_KEY_A && action == GLFW_PRESS)
+        {
+            p1Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+        }
+        // P2
+        if (key == GLFW_KEY_W && action == GLFW_PRESS)
+        {
+            p2X_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+        }
+        if (key == GLFW_KEY_S && action == GLFW_PRESS)
+        {
+            p2Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+        }
+        // P3
+        if (key == GLFW_KEY_E && action == GLFW_PRESS)
+        {
+            p3X_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+        }
+        if (key == GLFW_KEY_D && action == GLFW_PRESS)
+        {
+            p3Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+        }
+        // P4
+        if (key == GLFW_KEY_R && action == GLFW_PRESS)
+        {
+            p4X_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+        }
+        if (key == GLFW_KEY_F && action == GLFW_PRESS)
+        {
+            p4Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+        }
+        
 
         if ((key == GLFW_KEY_SPACE || key == GLFW_KEY_ESCAPE) && action == GLFW_PRESS)
         {
