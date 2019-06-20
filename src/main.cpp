@@ -186,14 +186,14 @@ float g_scaleY_5 = 0.5f;
 float g_scaleZ_5 = 0.5f;
 
 // definições dos pontos para a curva do estande 9
-float p1Z_9 = 0.0f;
-float p1Y_9 = 0.0f;
-float p2Z_9 = 0.0f;
-float p2Y_9 = 0.0f;
-float p3Z_9 = 0.0f;
-float p3Y_9 = 0.0f;
-float p4Z_9 = 0.0f;
-float p4Y_9 = 0.0f;
+float p1X_9 = 0.1f;
+float p1Y_9 = 0.1f;
+float p2X_9 = 0.5f;
+float p2Y_9 = 0.5f;
+float p3X_9 = 1.3f;
+float p3Y_9 = 1.3f;
+float p4X_9 = 1.4f;
+float p4Y_9 = 1.4f;
 
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
 // pressionado no momento atual. Veja função MouseButtonCallback().
@@ -653,18 +653,20 @@ int main(int argc, char* argv[])
         // estande 9
         float t_bezier = cos(time_now);
 
-        glm::vec4 p1 (0.0f, p1Y_9, p1Z_9, 1.0f);
-        glm::vec4 p2 (0.0f, p2Y_9, p2Z_9, 1.0f);
-        glm::vec4 p3 (0.0f, p3Y_9, p3Z_9, 1.0f);
-        glm::vec4 p4 (0.0f, p4Y_9, p4Z_9, 1.0f);
+        glm::vec4 p1 (0.0f, p1Y_9, p1X_9, 1.0f);
+        glm::vec4 p2 (0.0f, p2Y_9, p2X_9, 1.0f);
+        glm::vec4 p3 (0.0f, p3Y_9, p3X_9, 1.0f);
+        glm::vec4 p4 (0.0f, p4Y_9, p4X_9, 1.0f);
 
         glm::vec4 deslocamento_9 = bezier(t_bezier, p1, p2, p3, p4);
 
-        model = Matrix_Translate(posicoes_estandes[9-1].x, posicoes_estandes[9-1].y + 4.0f/* - 2.0f + deslocamento_9.y*/, posicoes_estandes[9-1].z /*- 2.0f + deslocamento_9.z*/)
-              * Matrix_Scale(1.0f, 1.0f, 1.0f);
+        printf("x = %f y = %f z = %f\n", deslocamento_9.x, deslocamento_9.y, deslocamento_9.z);
+
+        model = Matrix_Translate(posicoes_estandes[9-1].x - 2.0f + deslocamento_9.x, posicoes_estandes[9-1].y + 4.0f - 2.0f + deslocamento_9.y, posicoes_estandes[9-1].z)
+              * Matrix_Scale(0.5f, 0.5f, 0.5f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, GALINHA);
-        DrawVirtualObject("chicken");
+        glUniform1i(object_id_uniform, VACA);
+        DrawVirtualObject("cow");
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
@@ -1686,7 +1688,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         // P1
         if (key == GLFW_KEY_Q && action == GLFW_PRESS)
         {
-            p1Z_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+            p1X_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
         }
         if (key == GLFW_KEY_A && action == GLFW_PRESS)
         {
@@ -1695,7 +1697,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         // P2
         if (key == GLFW_KEY_W && action == GLFW_PRESS)
         {
-            p2Z_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+            p2X_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
         }
         if (key == GLFW_KEY_S && action == GLFW_PRESS)
         {
@@ -1704,7 +1706,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         // P3
         if (key == GLFW_KEY_E && action == GLFW_PRESS)
         {
-            p3Z_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+            p3X_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
         }
         if (key == GLFW_KEY_D && action == GLFW_PRESS)
         {
@@ -1713,7 +1715,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         // P4
         if (key == GLFW_KEY_R && action == GLFW_PRESS)
         {
-            p4Z_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+            p4X_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
         }
         if (key == GLFW_KEY_F && action == GLFW_PRESS)
         {
