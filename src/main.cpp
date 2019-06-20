@@ -623,7 +623,7 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, DINOSSAURO);
         DrawVirtualObject("triceratop");
 
-        //estande 4
+        // estande 4
         model = Matrix_Translate(posicoes_estandes[4-1].x, posicoes_estandes[4-1].y + 4.5f, posicoes_estandes[4-1].z)
               * Matrix_Scale(0.3f, 0.3f, 0.3f)
               * Matrix_Rotate_X((float)glfwGetTime() * 1.0f);
@@ -631,17 +631,15 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, TRIANGULO);
         DrawVirtualObject("triangulo");
 
-        //estande 5
+        // estande 5
         model = Matrix_Translate(posicoes_estandes[5-1].x, posicoes_estandes[5-1].y + 4.0f, posicoes_estandes[5-1].z)
               * Matrix_Scale(g_scaleX_5, g_scaleY_5, g_scaleZ_5)
               * Matrix_Rotate_X(g_AngleX_5)
               * Matrix_Rotate_Y(g_AngleY_5)
               * Matrix_Rotate_Z(g_AngleZ_5);
-
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, VACA);
         DrawVirtualObject("cow");
-
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
@@ -1475,11 +1473,9 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         g_AngleX_5 = 0.0f;
         g_AngleY_5 = 0.0f;
         g_AngleZ_5 = 0.0f;
-
         g_posX_5 = 0.0f;
         g_posY_5 = 0.0f;
         g_posZ_5 = 0.0f;
-
         g_scaleX_5 = 0.5f;
         g_scaleY_5 = 0.5f;
         g_scaleZ_5 = 0.5f;
