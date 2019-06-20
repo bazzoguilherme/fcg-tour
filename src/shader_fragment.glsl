@@ -26,6 +26,7 @@ uniform mat4 projection;
 #define VACA 4
 #define GALINHA 5
 #define ESFERA 6
+#define CUBO 7
 
 uniform int object_id;
 
@@ -171,6 +172,17 @@ void main()
         Ka = vec3(1.000000, 1.000000, 1.000000);
         Ks = vec3(0.8, 0.8, 0.8);
         q = 100.0;
+    }
+    else if (object_id == CUBO)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd = texture(TextureImage7, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        //Kd = vec3(0.640000, 0.640000, 0.640000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
     }
 
 

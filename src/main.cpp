@@ -341,7 +341,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "chicken", "esfera"};
+    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "chicken", "esfera", "cubo"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -551,6 +551,7 @@ int main(int argc, char* argv[])
         #define VACA 4
         #define GALINHA 5
         #define ESFERA 6
+        #define CUBO 7
 
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
@@ -651,6 +652,22 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, VACA);
         DrawVirtualObject("cow");
 
+        // estande 7
+        model = Matrix_Translate(posicoes_estandes[7-1].x + 0.2f, posicoes_estandes[7-1].y + 4.0f, posicoes_estandes[7-1].z + 0.3f)
+              * Matrix_Scale(0.25f, 0.25f, 0.25f)
+              * Matrix_Rotate_X(-1.5f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, CUBO);
+        DrawVirtualObject("cubo");
+
+        model = Matrix_Translate(posicoes_estandes[7-1].x - 0.1f, posicoes_estandes[7-1].y + 4.2f, posicoes_estandes[7-1].z - 0.5f)
+              * Matrix_Scale(0.25f, 0.25f, 0.25f)
+              * Matrix_Rotate_X(-1.5f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, CUBO);
+        DrawVirtualObject("cubo");
+
+
         // estande 9
         float t_bezier = cos(time_now);
 
@@ -745,6 +762,7 @@ void load_free_camera(){
     g_CameraDistance = CameraDistance_save;
     g_CameraPhi = CameraPhi_FC_save;
     g_CameraTheta = CameraTheta_FC_save;
+    g_UsePerspectiveProjection = true;
 }
 
 void load_look_at_camera(){
@@ -1564,13 +1582,13 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla P, utilizamos projeção perspectiva.
-    if (key == GLFW_KEY_P && action == GLFW_PRESS)
+    if (key == GLFW_KEY_P && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 7-1)
     {
         g_UsePerspectiveProjection = true;
     }
 
     // Se o usuário apertar a tecla O, utilizamos projeção ortográfica.
-    if (key == GLFW_KEY_O && action == GLFW_PRESS)
+    if (key == GLFW_KEY_O && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 7-1)
     {
         g_UsePerspectiveProjection = false;
     }
