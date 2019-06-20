@@ -268,6 +268,7 @@ GLint projection_uniform;
 GLint object_id_uniform;
 GLint bbox_min_uniform;
 GLint bbox_max_uniform;
+GLint estande_shader;
 
 // Número de texturas carregadas pela função LoadTextureImage()
 GLuint g_NumLoadedTextures = 0;
@@ -547,6 +548,8 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(view_uniform       , 1 , GL_FALSE , glm::value_ptr(view));
         glUniformMatrix4fv(projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
 
+
+        glUniform1i(estande_shader, estande_atual);
 
         #define MUSEU 0
         #define ESTANDE 1
@@ -1006,6 +1009,9 @@ void LoadShadersFromFiles()
     bbox_min_uniform        = glGetUniformLocation(program_id, "bbox_min");
     bbox_max_uniform        = glGetUniformLocation(program_id, "bbox_max");
 
+    estande_shader = glGetUniformLocation(program_id, "estande_atual");
+
+
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(program_id);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage0"), 0);
@@ -1019,6 +1025,8 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage8"), 8);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage9"), 9);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage10"), 10);
+
+    
     glUseProgram(0);
 }
 

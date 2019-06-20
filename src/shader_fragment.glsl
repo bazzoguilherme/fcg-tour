@@ -49,6 +49,9 @@ uniform sampler2D TextureImage8;
 uniform sampler2D TextureImage9;
 uniform sampler2D TextureImage10;
 
+
+uniform int estande_atual = 0;
+
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
 vec3 lambert_color;
@@ -237,7 +240,6 @@ void main()
         color = lambert_color;
     else
         color = lambert_diffuse_term + ambient_term + phong_specular_term ;
-
 
 
     // Cor final com correção gamma, considerando monitor sRGB.
