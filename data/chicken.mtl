@@ -12,5 +12,5 @@ newmtl _10864_rotisserie_chicken_v2_L303___Default
 	Kd 0.5882 0.5882 0.5882
 	Ks 0.2800 0.2271 0.1435
 	Ke 0.0000 0.0000 0.0000
-	map_Ka chicken.jpg
-	map_Kd chicken.jpg
+	map_Ka chicken.png
+	map_Kd chicken.png

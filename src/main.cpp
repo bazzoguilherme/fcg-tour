@@ -660,7 +660,7 @@ int main(int argc, char* argv[])
 
         glm::vec4 deslocamento_9 = bezier(t_bezier, p1, p2, p3, p4);
         
-        model = model = Matrix_Translate(posicoes_estandes[9-1].x, posicoes_estandes[9-1].y + 4.0f - 2.0f + deslocamento_9.y, posicoes_estandes[9-1].z - 2.0f + deslocamento_9.z)
+        model = model = Matrix_Translate(posicoes_estandes[9-1].x, posicoes_estandes[9-1].y + 4.0f/* - 2.0f + deslocamento_9.y*/, posicoes_estandes[9-1].z /*- 2.0f + deslocamento_9.z*/)
               * Matrix_Scale(1.0f, 1.0f, 1.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, GALINHA);
