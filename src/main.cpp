@@ -651,7 +651,7 @@ int main(int argc, char* argv[])
 
         // estande 9
         model = model = Matrix_Translate(posicoes_estandes[9-1].x, posicoes_estandes[9-1].y + 4.0f, posicoes_estandes[9-1].z)
-              * Matrix_Scale(0.3f, 0.3f, 0.3f);
+              * Matrix_Scale(1.0f, 1.0f, 1.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, SAPO);
         DrawVirtualObject("frog");
