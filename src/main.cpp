@@ -171,6 +171,21 @@ float g_AngleX = 0.0f;
 float g_AngleY = 0.0f;
 float g_AngleZ = 0.0f;
 
+
+// definições das informações do objeto no estande 5
+float g_AngleX_5 = 0.0f;
+float g_AngleY_5 = 0.0f;
+float g_AngleZ_5 = 0.0f;
+
+float g_posX_5 = -1.2*(5-1);
+float g_posY_5 = -4.8f;
+float g_posZ_5 = -11.0f;
+
+float g_scaleX_5 = 1.0f;
+float g_scaleY_5 = 1.0f;
+float g_scaleZ_5 = 1.0f;
+
+
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
 // pressionado no momento atual. Veja função MouseButtonCallback().
 bool g_LeftMouseButtonPressed = false;
@@ -217,6 +232,9 @@ struct square_bbox{
     glm::vec3   p3;
     glm::vec3   p4;
 };
+
+// flag para se usuario olhando para o estande 5
+int olhando_5 = 0;
 
 struct square_bbox Museu;
 std::vector<square_bbox> estandes_bbox;
@@ -520,6 +538,7 @@ int main(int argc, char* argv[])
         #define MUSEU 0
         #define ESTANDE 1
         #define DINOSSAURO 2
+        #define COELHO 3
 
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
@@ -608,6 +627,8 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, DINOSSAURO);
         DrawVirtualObject("triceratop");
 
+        //estande 5 - 
+
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
@@ -649,13 +670,13 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-glm::vec4 bezier(float t, glm::vec4 a, glm::vec4 b, glm::vec4 c, glm::vec4 d)
+glm::vec4 bezier(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4)
 {
 
-    glm::vec4 p1 (a.x, a.y, a.z, 1.0f);
-    glm::vec4 p2 (b.x, b.y, b.z, 1.0f);
-    glm::vec4 p3 (c.x, c.y, c.z, 1.0f);
-    glm::vec4 p4 (d.x, d.y, d.z, 1.0f);
+    glm::vec4 p1 (p1.x, p1.y, p1.z, 1.0f);
+    glm::vec4 p2 (p2.x, p2.y, p2.z, 1.0f);
+    glm::vec4 p3 (p3.x, p3.y, p3.z, 1.0f);
+    glm::vec4 p4 (p4.x, p4.y, p4.z, 1.0f);
 
     glm::vec4 c12 = p1 + t*(p2-p1);
     glm::vec4 c23 = p2 + t*(p3-p2);
@@ -1451,19 +1472,19 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     float delta = M_PI / 16; // 22.5 graus, em radianos.
 
-    if (key == GLFW_KEY_X && action == GLFW_PRESS)
-    {
-        g_AngleX += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
-    }
+    // if (key == GLFW_KEY_X && action == GLFW_PRESS)
+    // {
+    //     g_AngleX += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+    // }
 
-    if (key == GLFW_KEY_Y && action == GLFW_PRESS)
-    {
-        g_AngleY += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
-    }
-    if (key == GLFW_KEY_Z && action == GLFW_PRESS)
-    {
-        g_AngleZ += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
-    }
+    // if (key == GLFW_KEY_Y && action == GLFW_PRESS)
+    // {
+    //     g_AngleY += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+    // }
+    // if (key == GLFW_KEY_Z && action == GLFW_PRESS)
+    // {
+    //     g_AngleZ += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+    // }
 
     // Se o usuário apertar a tecla espaço, resetamos os ângulos de Euler para zero.
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
@@ -1544,6 +1565,64 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         }
     }
 
+    // Ações específicas para cada estande
+    // se estande 5
+    if (estande_atual == 5-1)
+    {
+        if (key == GLFW_KEY_X && action == GLFW_PRESS)
+        {
+            g_AngleX_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+        if (key == GLFW_KEY_C && action == GLFW_PRESS)
+        {
+            g_AngleY_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+        if (key == GLFW_KEY_Z && action == GLFW_PRESS)
+        {
+            g_AngleZ_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+
+        if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+        {
+            g_posX_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+        if (key == GLFW_KEY_W && action == GLFW_PRESS)
+        {
+            g_posY_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+        if (key == GLFW_KEY_E && action == GLFW_PRESS)
+        {
+            g_posZ_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+
+        if (key == GLFW_KEY_A && action == GLFW_PRESS)
+        {
+            g_scaleX_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+        if (key == GLFW_KEY_S && action == GLFW_PRESS)
+        {
+            g_scaleY_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+        if (key == GLFW_KEY_D && action == GLFW_PRESS)
+        {
+            g_scaleZ_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+
+        if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+        {
+            g_AngleX_5 = 0.0f;
+            g_AngleY_5 = 0.0f;
+            g_AngleZ_5 = 0.0f;
+            
+            g_posX_5 = 0.0f;
+            g_posY_5 = 0.0f;
+            g_posZ_5 = 0.0f;
+
+            g_scaleX_5 = 0.0f;
+            g_scaleY_5 = 0.0f;
+            g_scaleZ_5 = 0.0f;
+        }
+    }
 }
 
 // Definimos o callback para impressão de erros da GLFW no terminal
