@@ -494,7 +494,7 @@ int main(int argc, char* argv[])
         // LOOK AT CAMERA
         } else {
             // Ponto "c", centro da câmera
-            camera_position_c  = glm::vec4(posicoes_estandes[estande_atual].x, y, posicoes_estandes[estande_atual].z - (1.5f*sgn(posicoes_estandes[estande_atual].z)),1.0f);
+            camera_position_c  = glm::vec4(posicoes_estandes[estande_atual].x, y + 0.5f, posicoes_estandes[estande_atual].z - (2.2f*sgn(posicoes_estandes[estande_atual].z)),1.0f);
             // Ponto "l", onde câmera está olhando
             camera_lookat_l    = glm::vec4(posicoes_estandes[estande_atual].x, posicoes_estandes[estande_atual].y + 3.2f, posicoes_estandes[estande_atual].z, 1.0f);
             // Vetor "view", sentido para onde a câmera está virada
@@ -660,7 +660,7 @@ int main(int argc, char* argv[])
 
         glm::vec4 deslocamento_9 = bezier(t_bezier, p1, p2, p3, p4);
 
-        printf("x = %f y = %f z = %f\n", deslocamento_9.x, deslocamento_9.y, deslocamento_9.z);
+        //printf("x = %f y = %f z = %f\n", deslocamento_9.x, deslocamento_9.y, deslocamento_9.z);
 
         model = Matrix_Translate(posicoes_estandes[9-1].x - 2.0f + deslocamento_9.x, posicoes_estandes[9-1].y + 4.0f - 2.0f + deslocamento_9.y, posicoes_estandes[9-1].z)
               * Matrix_Scale(0.5f, 0.5f, 0.5f);
