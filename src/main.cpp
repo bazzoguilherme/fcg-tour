@@ -172,6 +172,10 @@ float g_AngleX = 0.0f;
 float g_AngleY = 0.0f;
 float g_AngleZ = 0.0f;
 
+//estande 2
+float g_Angle_Stand2 = 0.0f;
+float g_aux_Stand2 = 0.0f;
+
 // definições das informações do objeto no estande 5
 float g_AngleX_5 = 0.0f;
 float g_AngleY_5 = 0.0f;
@@ -252,8 +256,6 @@ struct square_bbox{
     glm::vec3   p4;
 };
 
-// flag para se usuario olhando para o estande 5
-int olhando_5 = 0;
 
 struct square_bbox Museu;
 std::vector<square_bbox> estandes_bbox;
@@ -355,7 +357,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "esfera", "cubo", "rosquinha_1", "rosquinha_2", "lampada", "chaleira", "plano_gc_real"};
+    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "esfera", "cubo", "rosquinha_1", "rosquinha_2", "lampada", "chaleira", "plano_gc_real", "vetor"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -382,11 +384,6 @@ int main(int argc, char* argv[])
         ComputeNormals(&obj_model);
         BuildTrianglesAndAddToVirtualScene(&obj_model);
     }
-
-
-
-
-
 
 
     if ( argc > 1 )
@@ -596,6 +593,9 @@ int main(int argc, char* argv[])
         #define CHALEIRA_ESFERICA 12
         #define CHALEIRA_CILINDRICA 13
         #define PLANO_GC_REAL 14
+        #define VETOR_ESTATICO 15
+        #define VETOR_MOVE 16
+        #define VETOR_RESULTANTE 17
 
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
@@ -685,6 +685,31 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, PLANO_GC_REAL);
         DrawVirtualObject("plano_gc_real");
+
+        // estante 2
+        model = Matrix_Translate(posicoes_estandes[2-1].x - 0.45f, posicoes_estandes[2-1].y + 3.82f, posicoes_estandes[2-1].z - 0.2f)
+              * Matrix_Scale(0.30f, 0.2f, 0.3f)
+              * Matrix_Rotate_X(0.4f)
+              * Matrix_Rotate_Y(-M_PI/2);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, VETOR_ESTATICO);
+        DrawVirtualObject("vetor");
+
+        model = Matrix_Translate(posicoes_estandes[2-1].x - 0.3f, posicoes_estandes[2-1].y + 3.84f, posicoes_estandes[2-1].z + 0.0f - g_Angle_Stand2*0.15f)
+              * Matrix_Scale(0.30f, 0.2f, 0.3f)
+              * Matrix_Rotate_X(0.4f)
+              * Matrix_Rotate_Y(M_PI + g_Angle_Stand2);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, VETOR_MOVE);
+        DrawVirtualObject("vetor");
+
+        model = Matrix_Translate(posicoes_estandes[2-1].x - 0.33f, posicoes_estandes[2-1].y + 3.9f, posicoes_estandes[2-1].z - 0.05f - g_Angle_Stand2*0.085f)
+              * Matrix_Scale(0.3f + (g_aux_Stand2*0.011), 0.4f + (g_aux_Stand2*0.015), 0.3f + (g_aux_Stand2*0.011))
+              * Matrix_Rotate_X(0.2f)
+              * Matrix_Rotate_Y(-(27*M_PI)/36 + (g_aux_Stand2*0.035));
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, VETOR_RESULTANTE);
+        DrawVirtualObject("vetor");
 
         // estande 4
         model = Matrix_Translate(posicoes_estandes[4-1].x, posicoes_estandes[4-1].y + 4.2f, posicoes_estandes[4-1].z)
@@ -1120,6 +1145,8 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage17"), 17);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage18"), 18);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage19"), 19);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage20"), 20);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage21"), 21);
 
 
     glUseProgram(0);
@@ -1829,6 +1856,18 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_D)
         pressedD = (action == GLFW_RELEASE) ? 0 : 1;
 
+    if (key == GLFW_KEY_UP && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 2-1){
+        if (g_Angle_Stand2 < 0.5f){
+            g_Angle_Stand2 += 0.05f;
+            g_aux_Stand2 += 1.0f;
+        }
+    }
+    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 2-1){
+        if (g_Angle_Stand2 > -0.5f){
+            g_Angle_Stand2 -= 0.05f;
+            g_aux_Stand2 -= 1.0f;
+        }
+    }
 
     // Andar entre os estandes
     if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS && camera_view_ID==2) {
