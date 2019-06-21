@@ -355,7 +355,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "esfera", "cubo", "rosquinha_1", "rosquinha_2", "lampada", "chaleira"};
+    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "esfera", "cubo", "rosquinha_1", "rosquinha_2", "lampada", "chaleira", "plano_gc_real"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -595,6 +595,7 @@ int main(int argc, char* argv[])
         #define CHALEIRA_CUBICA 11
         #define CHALEIRA_ESFERICA 12
         #define CHALEIRA_CILINDRICA 13
+        #define PLANO_GC_REAL 14
 
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
@@ -676,6 +677,14 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, DINOSSAURO);
         DrawVirtualObject("triceratop");
+
+        // estande 1
+        model = Matrix_Translate(posicoes_estandes[1-1].x, posicoes_estandes[1-1].y + 3.68f, posicoes_estandes[1-1].z)
+              * Matrix_Scale(0.6f, 0.6f, 0.6f)
+              * Matrix_Rotate_X(0.4f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANO_GC_REAL);
+        DrawVirtualObject("plano_gc_real");
 
         // estande 4
         model = Matrix_Translate(posicoes_estandes[4-1].x, posicoes_estandes[4-1].y + 4.2f, posicoes_estandes[4-1].z)
@@ -1109,6 +1118,8 @@ void LoadShadersFromFiles()
     glUniform1i(glGetUniformLocation(program_id, "TextureImage15"), 15);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage16"), 16);
     glUniform1i(glGetUniformLocation(program_id, "TextureImage17"), 17);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage18"), 18);
+    glUniform1i(glGetUniformLocation(program_id, "TextureImage19"), 19);
 
 
     glUseProgram(0);

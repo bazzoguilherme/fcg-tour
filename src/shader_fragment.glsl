@@ -33,6 +33,7 @@ uniform mat4 projection;
 #define CHALEIRA_CUBICA 11
 #define CHALEIRA_ESFERICA 12
 #define CHALEIRA_CILINDRICA 13
+#define PLANO_GC_REAL 14
 
 uniform int object_id;
 
@@ -59,6 +60,8 @@ uniform sampler2D TextureImage14;
 uniform sampler2D TextureImage15;
 uniform sampler2D TextureImage16;
 uniform sampler2D TextureImage17;
+uniform sampler2D TextureImage18;
+uniform sampler2D TextureImage19;
 
 
 uniform int estande_atual = 0;
@@ -365,7 +368,16 @@ void main()
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
     }
+    else if (object_id == PLANO_GC_REAL)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd = texture(TextureImage18, vec2(U,V)).rgb ;
 
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+    }
 
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
