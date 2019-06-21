@@ -138,6 +138,8 @@ bool check_inside_museum(float x, float z);
 float F_p1_p2(glm::vec3 v, glm::vec3 a, float x, float z);
 
 glm::vec4 bezier(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4);
+bool interseccao_caixa_caixa(struct box_obj obj1, struct box_obj obj2);
+bool interseccao_esfera_esfera(struct sphere_obj obj1, struct sphere_obj obj2);
 bool check_colision(float x, float z);
 
 // Definimos uma estrutura que armazenará dados necessários para renderizar
@@ -256,6 +258,24 @@ struct square_bbox{
     glm::vec3   p4;
 };
 
+struct box_obj {
+    glm::vec3   c; // center
+    float       x_size; // distance from center to x
+    float       y_size; // distance from center to y
+    float       z_size; // distance from center to z
+};
+
+struct sphere_obj {
+    glm::vec3   c; // center
+    float       r; // radius
+};
+
+struct plane_obj {
+    glm::vec3   c; // center
+    float       x_size; // distance from center to x
+    float       z_size; // distance from center to z
+};
+
 
 struct square_bbox Museu;
 std::vector<square_bbox> estandes_bbox;
@@ -357,7 +377,7 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "esfera", "cubo", "rosquinha_1", "rosquinha_2", "lampada", "chaleira", "plano_gc_real", "vetor"};
+    std::vector<const char*> object_names = {"museu", "estande", "triceratop", "triangulo", "cow", "esfera", "cubo", "rosquinha_1", "rosquinha_2", "lampada", "chaleira", "plano_gc_real", "vetor", "plano"};
     std::vector<const char*>::iterator iterator_obj_names ;
 
     const char* basepath = "../../data/";
@@ -596,6 +616,7 @@ int main(int argc, char* argv[])
         #define VETOR_ESTATICO 15
         #define VETOR_MOVE 16
         #define VETOR_RESULTANTE 17
+        #define PLANO 18
 
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
@@ -800,8 +821,6 @@ int main(int argc, char* argv[])
 
         glm::vec4 deslocamento_9 = bezier(t_bezier, p1, p2, p3, p4);
 
-        //printf("x = %f y = %f z = %f\n", deslocamento_9.x, deslocamento_9.y, deslocamento_9.z);
-
         model = Matrix_Translate(deslocamento_9.x, deslocamento_9.y, deslocamento_9.z)
               * Matrix_Scale(0.3f, 0.3f, 0.3f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
@@ -855,6 +874,76 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, CHALEIRA_CILINDRICA);
         DrawVirtualObject("chaleira");
+
+
+        // estande 18
+        model = Matrix_Translate(posicoes_estandes[18-1].x, posicoes_estandes[18-1].y + 3.8f, posicoes_estandes[18-1].z - 0.3f)
+              * Matrix_Scale(0.65f, 0.6f, 0.46f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, PLANO);
+        DrawVirtualObject("plano");
+
+
+        model = Matrix_Translate(posicoes_estandes[18-1].x, posicoes_estandes[18-1].y + 5.0f /*+ object_fall*/, posicoes_estandes[18-1].z - 0.3f)
+              * Matrix_Scale(0.08f, 0.08f, 0.08f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, CUBO);
+        DrawVirtualObject("cubo");
+
+        glm::vec3 obj_min = g_VirtualScene["cubo"].bbox_min;
+        glm::vec3 obj_max = g_VirtualScene["cubo"].bbox_max;
+        glm::vec4 obj_min_vec4 = glm::vec4(obj_min.x, obj_min.y, obj_min.z, 1.0f);
+        glm::vec4 obj_max_vec4 = glm::vec4(obj_max.x, obj_max.y, obj_max.z, 1.0f);
+
+        posMin = model * obj_min_vec4;
+        posMax = model * obj_max_vec4;
+
+        struct box_obj obj1;
+        obj1.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
+        obj1.x_size = abs(obj1.c.x) - abs(posMin.x);
+        obj1.y_size = abs(obj1.c.y) - abs(posMin.y);
+        obj1.z_size = abs(obj1.c.z) - abs(posMin.z);
+
+
+
+
+
+        model = Matrix_Translate(posicoes_estandes[18-1].x, posicoes_estandes[18-1].y + 4.5f /*+ object_fall*/, posicoes_estandes[18-1].z - 0.3f)
+              * Matrix_Scale(0.08f, 0.08f, 0.08f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, CUBO);
+        DrawVirtualObject("cubo");
+
+        obj_min = g_VirtualScene["cubo"].bbox_min;
+        obj_max = g_VirtualScene["cubo"].bbox_max;
+        obj_min_vec4 = glm::vec4(obj_min.x, obj_min.y, obj_min.z, 1.0f);
+        obj_max_vec4 = glm::vec4(obj_max.x, obj_max.y, obj_max.z, 1.0f);
+
+        posMin = model * obj_min_vec4;
+        posMax = model * obj_max_vec4;
+
+        struct box_obj obj2;
+        obj2.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
+        obj2.x_size = abs(obj2.c.x) - abs(posMin.x);
+        obj2.y_size = abs(obj2.c.y) - abs(posMin.y);
+        printf("Y: %f\n", obj2.y_size);
+        obj2.z_size = abs(obj2.c.z) - abs(posMin.z);
+
+        if (interseccao_caixa_caixa(obj1, obj2)){
+            printf("INTERSECAO\n");
+        } else {
+            printf("NOOOOO\n");
+        }
+
+
+        // model = Matrix_Translate(posicoes_estandes[18-1].x + 0.5, posicoes_estandes[18-1].y + 5.0f, posicoes_estandes[18-1].z - 0.3f)
+        //       * Matrix_Scale(0.12f, 0.12f, 0.12f);
+        // glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        // glUniform1i(object_id_uniform, ESFERA);
+        // DrawVirtualObject("esfera");
+
+
+
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
@@ -931,6 +1020,23 @@ void load_look_at_camera(){
     camera_view_ID = LOOK_AT_CAMERA;
 }
 
+bool interseccao_caixa_caixa(struct box_obj obj1, struct box_obj obj2){
+    glm::vec3 distancia_centros = (obj1.c - obj2.c);
+
+    bool x_dist = abs(distancia_centros.x) <= (obj1.x_size + obj2.x_size);
+    bool y_dist = abs(distancia_centros.y) <= (obj1.y_size + obj2.y_size);
+    bool z_dist = abs(distancia_centros.z) <= (obj1.z_size + obj2.z_size);
+    printf("%d - %f - %d\n", x_dist, obj1.y_size + obj2.y_size, z_dist);
+    return (x_dist && y_dist && z_dist);
+}
+
+bool interseccao_esfera_esfera(struct sphere_obj obj1, struct sphere_obj obj2){
+    glm::vec3 vetor_dist = obj1.c - obj2.c;
+    float distancia_centros = sqrt( pow(vetor_dist.x,2) + pow(vetor_dist.y,2) + pow(vetor_dist.z,2) );
+
+    return distancia_centros <= (obj1.r + obj2.r);
+}
+
 /// return true if inside museum
 bool check_inside_museum(float x,  float z){
     glm::vec3 p_41 = Museu.p4 - Museu.p1;
@@ -982,7 +1088,7 @@ float F_p1_p2(glm::vec3 v, glm::vec3 a, float x, float z){
 }
 
 bool check_colision(float x, float z){
-    return check_inside_museum(x, z) && check_estandes(x, z);
+    return check_inside_museum(x, z) && check_estandes(x, z); //check_dinosaur(x, z);
 }
 
 // Função que carrega uma imagem para ser utilizada como textura
@@ -1780,11 +1886,13 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     {
         g_UsePerspectiveProjection = true;
     }
-
     // Se o usuário apertar a tecla O, utilizamos projeção ortográfica.
     if (key == GLFW_KEY_O && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 7-1)
     {
         g_UsePerspectiveProjection = false;
+    }
+    if(camera_view_ID == LOOK_AT_CAMERA && estande_atual != 7-1){
+        g_UsePerspectiveProjection = true;
     }
 
     // Se o usuário apertar a tecla H, fazemos um "toggle" do texto informativo mostrado na tela.

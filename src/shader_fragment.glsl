@@ -36,6 +36,9 @@ uniform mat4 projection;
 #define PLANO_GC_REAL 14
 #define VETOR_ESTATICO 15
 #define VETOR_MOVE 16
+#define VETOR_RESULTANTE 17
+#define PLANO 18
+
 
 uniform int object_id;
 
@@ -397,6 +400,16 @@ void main()
         U = texcoords.x;
         V = texcoords.y;
         Kd = texture(TextureImage13, vec2(U,V)).rgb ;
+
+        Ka = vec3(1.000000, 1.000000, 1.000000);
+        Ks = vec3(0.500000, 0.500000, 0.500000);
+        q = 20.0;
+    }
+    else if (object_id == PLANO)
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd = texture(TextureImage20, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
         Ks = vec3(0.500000, 0.500000, 0.500000);
