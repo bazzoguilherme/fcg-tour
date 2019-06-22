@@ -372,7 +372,7 @@ int main(int argc, char* argv[])
     // ... ou movimentar o cursor do mouse em cima da janela ...
     glfwSetCursorPosCallback(window, CursorPosCallback);
     // ... ou rolar a "rodinha" do mouse.
-    glfwSetScrollCallback(window, ScrollCallback);
+    //glfwSetScrollCallback(window, ScrollCallback);
 
     // Indicamos que as chamadas OpenGL deverão renderizar nesta janela
     glfwMakeContextCurrent(window);
@@ -860,9 +860,9 @@ int main(int argc, char* argv[])
 
 
         // estande 10
-        model = Matrix_Translate(posicoes_estandes[10-1].x, posicoes_estandes[10-1].y + 3.65f, posicoes_estandes[10-1].z + 0.2f)
+        model = Matrix_Translate(posicoes_estandes[10-1].x, posicoes_estandes[10-1].y + 3.85f, posicoes_estandes[10-1].z + 0.5f)
               * Matrix_Scale(2.6f, 2.6f, 2.6f)
-              * Matrix_Rotate_X(-1.2f);
+              * Matrix_Rotate_X(-2.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, LAMPADA);
         DrawVirtualObject("lampada");
@@ -2714,53 +2714,53 @@ void informative_text_stand(GLFWwindow* window){
     if (camera_view_ID == LOOK_AT_CAMERA){
         if (estande_atual == 1-1){
             TextRendering_PrintString(window, "Imagem Real ou feita por Computacao Grafica?", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "     1: Real", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "     2: Computacao Grafica", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   1: Real", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   2: Computacao Grafica", -1.0f, 1.0f-3*lineheight, 1.0f);
         } else 
         if (estande_atual == 2-1){
             TextRendering_PrintString(window, "Vetores:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "     Utilizando as teclas cima/baixo, altera direcao do vetor azul.", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "     Ao alterar sua direcao, notamos que a soma dos vetores (identificado pelo vetor preto) tambem eh alterada.", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Utilizando as teclas cima/baixo, altera direcao do vetor azul.", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Podemos notar que a soma dos vetores (identificado pelo vetor preto) tambem se altera.", -1.0f, 1.0f-3*lineheight, 1.0f);
         } else 
         if (estande_atual == 3-1){
             TextRendering_PrintString(window, "Transformacoes Hierarquicas:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "     .", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "     .", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   .", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   .", -1.0f, 1.0f-3*lineheight, 1.0f);
         } else 
         if (estande_atual == 4-1){
             TextRendering_PrintString(window, "Normais:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "     Quando o triangulo esta virado para camera, podemos visualiza-lo.", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "     Porem, quando esta virado ao contrario, nao o vemos.", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Quando o triangulo esta virado para camera, podemos visualiza-lo.", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Porem, quando esta virado ao contrario, nao o vemos.", -1.0f, 1.0f-3*lineheight, 1.0f);
         } else 
         if (estande_atual == 5-1){
             TextRendering_PrintString(window, "Transformacoes:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "     .", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "     .", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   .", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   .", -1.0f, 1.0f-3*lineheight, 1.0f);
         } else 
         if (estande_atual == 6-1){
             TextRendering_PrintString(window, "Euler Angles / Gimbal Lock:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "     Utilizando as teclas X,Y,Z podes alterar os angulos sobre o cubo.", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "     Ao pressionar a tecla G definimos o angulo y para Gimbal Lock, trancado as rotacoes ", -1.0f, 1.0f-3*lineheight, 1.0f);
-            TextRendering_PrintString(window, "       para duas-dimensoes degeneradas, sobre x e z.", -1.0f, 1.0f-4*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Utilizando as teclas X,Y,Z podes alterar os angulos sobre o cubo.", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Ao pressionar a tecla G definimos o angulo y para Gimbal Lock, trancado as rotacoes ", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "     para duas-dimensoes degeneradas, sobre x e z.", -1.0f, 1.0f-4*lineheight, 1.0f);
         } else 
         if (estande_atual == 7-1){
             TextRendering_PrintString(window, "Projecoes:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "     Podes alterar o tipo de projecao utilizando as teclas O e P, ", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "       para projecoes ortograficas e perspectivas, respectivamente.", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Podes alterar o tipo de projecao utilizando as teclas O e P, ", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "     para projecoes ortograficas e perspectivas, respectivamente.", -1.0f, 1.0f-3*lineheight, 1.0f);
         } else 
         if (estande_atual == 8-1){
             TextRendering_PrintString(window, "Z-fighting:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "     Ao termos 2 ou mais objetos com valores no z-buffer similares ou iguais", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "       temos este fenomeno, em que a imagem fica tremulante.", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Ao termos 2 ou mais objetos com valores no z-buffer similares ou iguais", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "     temos este fenomeno, em que a imagem fica tremulante.", -1.0f, 1.0f-3*lineheight, 1.0f);
         } else 
         if (estande_atual == 9-1){
             TextRendering_PrintString(window, "Curvas de Bezier:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "     Objeto se movendo na tela sobre a estande a partir de curvas de Bezier.", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "     *Alterar pontos*.", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Objeto se movendo na tela sobre a estande a partir de curvas de Bezier.", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   *Alterar pontos*.", -1.0f, 1.0f-3*lineheight, 1.0f);
         } else 
         if (estande_atual == 10-1){
             TextRendering_PrintString(window, "Alteracao de textura:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "     Podes aqui alterar a textura sobre a lampada com as teclas 1-6.", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Podes aqui alterar a textura sobre a lampada com as teclas 1-6.", -1.0f, 1.0f-2*lineheight, 1.0f);
         } else 
         if (estande_atual == 11-1){
             TextRendering_PrintString(window, "Flat Shading:", -1.0f, 1.0f-lineheight, 1.0f);
@@ -2773,8 +2773,8 @@ void informative_text_stand(GLFWwindow* window){
         } else 
         if (estande_atual == 14-1){
             TextRendering_PrintString(window, "Mapeamento de textura Planar:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "     Podes mudar de direcao de projecao com as teclas 1/2/3, ", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "     sendo elas (x,y), (x,z) e (y,z) respectivamente.", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Podes mudar de direcao de projecao com as teclas 1/2/3, ", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   sendo elas (x,y), (x,z) e (y,z) respectivamente.", -1.0f, 1.0f-3*lineheight, 1.0f);
         } else 
         if (estande_atual == 15-1){
             TextRendering_PrintString(window, "Mapeamento de textura Cubica:", -1.0f, 1.0f-lineheight, 1.0f);
@@ -2787,9 +2787,9 @@ void informative_text_stand(GLFWwindow* window){
         } else 
         if (estande_atual == 18-1){
             TextRendering_PrintString(window, "Interseccao de objetos:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "     A partir das teclas A e D podes alterar a posicao do objeto a ser solto.", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "     Apos definir sua posicao de queda, solta-o ao apertar a tecla ENTER.", -1.0f, 1.0f-3*lineheight, 1.0f);
-            TextRendering_PrintString(window, "         O processo eh reiciciado ao pressionar a tecla ENTER no apos a soltar os 5 objetos.", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   A partir das teclas A e D podes alterar a posicao do objeto a ser solto.", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Apos definir sua posicao de queda, solta-o ao apertar a tecla ENTER.", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "       O processo eh reiciciado ao pressionar a tecla ENTER no apos a soltar os 5 objetos.", -1.0f, 1.0f-3*lineheight, 1.0f);
         }
     }
 }
