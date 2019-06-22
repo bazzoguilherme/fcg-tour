@@ -24,6 +24,8 @@
 
 #define ERRO_COLISAO 0.1f
 
+#define OFFSET_PEACES 0.02f
+
 #define M_PI   3.14159265358979323846
 
 // Headers abaixo são específicos de C++
@@ -274,6 +276,11 @@ float cai_obj5 = 0.0f;
 bool libera_obj5 = false;
 float move_obj5 = 0.0f;
 
+float g_ForearmAngleX = 0.0f;
+float g_ForearmAngleZ = 0.0f;
+float g_TorsoPositionX = 0.0f;
+float g_TorsoPositionY = 0.0f;
+
 struct square_bbox{
     glm::vec3   p1;
     glm::vec3   p2;
@@ -298,6 +305,12 @@ struct plane_obj {
     float       x_size; // distance from center to x
     float       z_size; // distance from center to z
 };
+
+
+// Valor inicial do tempo
+double time_prev = glfwGetTime();
+double time_now;
+double passo_tempo;
 
 
 struct square_bbox Museu;
@@ -452,10 +465,6 @@ int main(int argc, char* argv[])
     glm::mat4 the_model;
     glm::mat4 the_view;
 
-    // Valor inicial do tempo
-    double time_prev = glfwGetTime();
-    double time_now;
-    double passo_tempo;
 
     // Ficamos em loop, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
@@ -640,6 +649,7 @@ int main(int argc, char* argv[])
         #define VETOR_MOVE 16
         #define VETOR_RESULTANTE 17
         #define PLANO 18
+        #define CUBO_HIERARQUICA 18
 
         glm::vec3 obj_min;
         glm::vec3 obj_max;
@@ -762,6 +772,113 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, VETOR_RESULTANTE);
         DrawVirtualObject("vetor");
+
+
+        // estande 3
+        // Torso
+        model = Matrix_Identity();
+        PushMatrix(model);
+            model = Matrix_Translate(posicoes_estandes[3-1].x, posicoes_estandes[3-1].y + 4.2f, posicoes_estandes[3-1].z)
+                    * Matrix_Scale(0.3f, 0.4f, 0.1f);
+                glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                glUniform1i(object_id_uniform, CUBO_HIERARQUICA);
+                DrawVirtualObject("cubo");
+        PopMatrix(model);
+
+        // Cabeça
+        PushMatrix(model);
+            model = Matrix_Translate(posicoes_estandes[3-1].x, posicoes_estandes[3-1].y + 4.85f, posicoes_estandes[3-1].z)
+                    * Matrix_Scale(0.2f, 0.2f, 0.15f);
+                glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                glUniform1i(object_id_uniform, CUBO_HIERARQUICA);
+                DrawVirtualObject("cubo");
+        PopMatrix(model);
+
+        // Braço direito
+        PushMatrix(model);
+            model = Matrix_Translate(posicoes_estandes[3-1].x - 0.395f, posicoes_estandes[3-1].y + 4.35f, posicoes_estandes[3-1].z);
+                PushMatrix(model);
+                    model = model
+                        * Matrix_Rotate_Z(-g_ForearmAngleZ)
+                        * Matrix_Rotate_X(g_ForearmAngleX);
+                    PushMatrix(model);
+                    model = model * Matrix_Scale(0.05f, 0.15f, 0.05f);
+                        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                        glUniform1i(object_id_uniform, CUBO_HIERARQUICA);
+                        DrawVirtualObject("cubo");
+                     PopMatrix(model);
+
+                    PushMatrix(model);
+                    model = model * Matrix_Translate(0.0f, -0.312f, 0.0f);
+                        model = model
+                            * Matrix_Rotate_Z(g_ForearmAngleZ)
+                            * Matrix_Rotate_X(g_ForearmAngleX);
+                        PushMatrix(model);
+                            model = model * Matrix_Scale(0.05f, 0.15f, 0.05f);
+                            glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                            glUniform1i(object_id_uniform, CUBO_HIERARQUICA);
+                            DrawVirtualObject("cubo");
+
+                            // Mão
+                            PushMatrix(model);
+                                model = model * Matrix_Translate(0.0f, -1.20f, 0.0f);
+                                PushMatrix(model);
+                                    model = model * Matrix_Scale(1.05f, 0.2f, 1.05f);
+                                    glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                                    glUniform1i(object_id_uniform, CUBO_HIERARQUICA);
+                                    DrawVirtualObject("cubo");
+                                PopMatrix(model);
+                            PopMatrix(model);
+
+
+                        PopMatrix(model);
+                    PopMatrix(model);
+
+            PopMatrix(model);
+        PopMatrix(model);
+
+        // Braço Esquerdo
+        PushMatrix(model);
+            model = Matrix_Translate(posicoes_estandes[3-1].x + 0.395f, posicoes_estandes[3-1].y + 4.35f, posicoes_estandes[3-1].z);
+                PushMatrix(model);
+                    model = model
+                        * Matrix_Rotate_Z(g_ForearmAngleZ)
+                        * Matrix_Rotate_X(g_ForearmAngleX);
+                    PushMatrix(model);
+                    model = model * Matrix_Scale(0.05f, 0.15f, 0.05f);
+                        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                        glUniform1i(object_id_uniform, CUBO_HIERARQUICA);
+                        DrawVirtualObject("cubo");
+                     PopMatrix(model);
+
+                    PushMatrix(model);
+                    model = model * Matrix_Translate(0.0f, -0.312f, 0.0f);
+                        model = model
+                            * Matrix_Rotate_Z(-g_ForearmAngleZ)
+                            * Matrix_Rotate_X(g_ForearmAngleX);
+                        PushMatrix(model);
+                            model = model * Matrix_Scale(0.05f, 0.15f, 0.05f);
+                            glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                            glUniform1i(object_id_uniform, CUBO_HIERARQUICA);
+                            DrawVirtualObject("cubo");
+
+                            // Mão
+                            PushMatrix(model);
+                                model = model * Matrix_Translate(0.0f, -1.20f, 0.0f);
+                                PushMatrix(model);
+                                    model = model * Matrix_Scale(1.05f, 0.2f, 1.05f);
+                                    glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+                                    glUniform1i(object_id_uniform, CUBO_HIERARQUICA);
+                                    DrawVirtualObject("cubo");
+                                PopMatrix(model);
+                            PopMatrix(model);
+
+
+                        PopMatrix(model);
+                    PopMatrix(model);
+
+            PopMatrix(model);
+        PopMatrix(model);
 
         // estande 4
         model = Matrix_Translate(posicoes_estandes[4-1].x, posicoes_estandes[4-1].y + 4.2f, posicoes_estandes[4-1].z)
@@ -1084,6 +1201,7 @@ int main(int argc, char* argv[])
         }
 
         informative_text_stand(window);
+
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
@@ -1971,8 +2089,8 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         float dy = ypos - g_LastCursorPosY;
 
         // Atualizamos parâmetros da antebraço com os deslocamentos
-        //g_ForearmAngleZ -= 0.01f*dx;
-        //g_ForearmAngleX += 0.01f*dy;
+        g_ForearmAngleZ -= (((g_ForearmAngleZ - passo_tempo*dx) < 0.5f) && ((g_ForearmAngleZ - passo_tempo*dx) > -0.15f) ) ? passo_tempo*dx : 0.0f;
+        g_ForearmAngleX += (absolute_float(g_ForearmAngleX + passo_tempo*dy) < 1.0f ) ? passo_tempo*dy : 0.0f;
 
         // Atualizamos as variáveis globais para armazenar a posição atual do
         // cursor como sendo a última posição conhecida do cursor.
@@ -2085,11 +2203,19 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         g_AngleX = 0.0f;
         g_AngleY = 0.0f;
         g_AngleZ = 0.0f;
-        //g_ForearmAngleX = 0.0f;
-        //g_ForearmAngleZ = 0.0f;
-        //g_TorsoPositionX = 0.0f;
-        //g_TorsoPositionY = 0.0f;
     }
+
+
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 3-1 )
+    {
+        g_ForearmAngleX = 0.0f;
+        g_ForearmAngleZ = 0.0f;
+        g_TorsoPositionX = 0.0f;
+        g_TorsoPositionY = 0.0f;
+    }
+
+
+
 
     // Se o usuário apertar a tecla P, utilizamos projeção perspectiva.
     if (key == GLFW_KEY_P && action == GLFW_PRESS && camera_view_ID == LOOK_AT_CAMERA && estande_atual == 7-1)
@@ -2710,86 +2836,86 @@ void informative_text_stand(GLFWwindow* window){
 
     float lineheight = TextRendering_LineHeight(window);
     float charwidth = TextRendering_CharWidth(window);
-    
+
     if (camera_view_ID == LOOK_AT_CAMERA){
         if (estande_atual == 1-1){
             TextRendering_PrintString(window, "Imagem Real ou feita por Computacao Grafica?", -1.0f, 1.0f-lineheight, 1.0f);
             TextRendering_PrintString(window, "   1: Real", -1.0f, 1.0f-2*lineheight, 1.0f);
             TextRendering_PrintString(window, "   2: Computacao Grafica", -1.0f, 1.0f-3*lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 2-1){
             TextRendering_PrintString(window, "Vetores:", -1.0f, 1.0f-lineheight, 1.0f);
             TextRendering_PrintString(window, "   Utilizando as teclas cima/baixo, altera direcao do vetor azul.", -1.0f, 1.0f-2*lineheight, 1.0f);
             TextRendering_PrintString(window, "   Podemos notar que a soma dos vetores (identificado pelo vetor preto) tambem se altera.", -1.0f, 1.0f-3*lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 3-1){
             TextRendering_PrintString(window, "Transformacoes Hierarquicas:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "   .", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "   .", -1.0f, 1.0f-3*lineheight, 1.0f);
-        } else 
+            TextRendering_PrintString(window, "   Voce pode controlar os bracos do robo utilizando o botao direito do mouse", -1.0f, 1.0f-2*lineheight, 1.0f);
+            //TextRendering_PrintString(window, "   Aqui eh realizada transformacoes hierarquicas nos bracos dele, ", -1.0f, 1.0f-3*lineheight, 1.0f);
+        } else
         if (estande_atual == 4-1){
             TextRendering_PrintString(window, "Normais:", -1.0f, 1.0f-lineheight, 1.0f);
             TextRendering_PrintString(window, "   Quando o triangulo esta virado para camera, podemos visualiza-lo.", -1.0f, 1.0f-2*lineheight, 1.0f);
             TextRendering_PrintString(window, "   Porem, quando esta virado ao contrario, nao o vemos.", -1.0f, 1.0f-3*lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 5-1){
             TextRendering_PrintString(window, "Transformacoes:", -1.0f, 1.0f-lineheight, 1.0f);
             TextRendering_PrintString(window, "   .", -1.0f, 1.0f-2*lineheight, 1.0f);
             TextRendering_PrintString(window, "   .", -1.0f, 1.0f-3*lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 6-1){
             TextRendering_PrintString(window, "Euler Angles / Gimbal Lock:", -1.0f, 1.0f-lineheight, 1.0f);
             TextRendering_PrintString(window, "   Utilizando as teclas X,Y,Z podes alterar os angulos sobre o cubo.", -1.0f, 1.0f-2*lineheight, 1.0f);
             TextRendering_PrintString(window, "   Ao pressionar a tecla G definimos o angulo y para Gimbal Lock, trancado as rotacoes ", -1.0f, 1.0f-3*lineheight, 1.0f);
             TextRendering_PrintString(window, "     para duas-dimensoes degeneradas, sobre x e z.", -1.0f, 1.0f-4*lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 7-1){
             TextRendering_PrintString(window, "Projecoes:", -1.0f, 1.0f-lineheight, 1.0f);
             TextRendering_PrintString(window, "   Podes alterar o tipo de projecao utilizando as teclas O e P, ", -1.0f, 1.0f-2*lineheight, 1.0f);
             TextRendering_PrintString(window, "     para projecoes ortograficas e perspectivas, respectivamente.", -1.0f, 1.0f-3*lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 8-1){
             TextRendering_PrintString(window, "Z-fighting:", -1.0f, 1.0f-lineheight, 1.0f);
             TextRendering_PrintString(window, "   Ao termos 2 ou mais objetos com valores no z-buffer similares ou iguais", -1.0f, 1.0f-2*lineheight, 1.0f);
             TextRendering_PrintString(window, "     temos este fenomeno, em que a imagem fica tremulante.", -1.0f, 1.0f-3*lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 9-1){
             TextRendering_PrintString(window, "Curvas de Bezier:", -1.0f, 1.0f-lineheight, 1.0f);
             TextRendering_PrintString(window, "   Objeto se movendo na tela sobre a estande a partir de curvas de Bezier.", -1.0f, 1.0f-2*lineheight, 1.0f);
             TextRendering_PrintString(window, "   *Alterar pontos*.", -1.0f, 1.0f-3*lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 10-1){
             TextRendering_PrintString(window, "Alteracao de textura:", -1.0f, 1.0f-lineheight, 1.0f);
             TextRendering_PrintString(window, "   Podes aqui alterar a textura sobre a lampada com as teclas 1-6.", -1.0f, 1.0f-2*lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 11-1){
             TextRendering_PrintString(window, "Flat Shading:", -1.0f, 1.0f-lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 12-1){
             TextRendering_PrintString(window, "Gouraud Shading:", -1.0f, 1.0f-lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 13-1){
             TextRendering_PrintString(window, "Phong Shading:", -1.0f, 1.0f-lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 14-1){
             TextRendering_PrintString(window, "Mapeamento de textura Planar:", -1.0f, 1.0f-lineheight, 1.0f);
             TextRendering_PrintString(window, "   Podes mudar de direcao de projecao com as teclas 1/2/3, ", -1.0f, 1.0f-2*lineheight, 1.0f);
             TextRendering_PrintString(window, "   sendo elas (x,y), (x,z) e (y,z) respectivamente.", -1.0f, 1.0f-3*lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 15-1){
             TextRendering_PrintString(window, "Mapeamento de textura Cubica:", -1.0f, 1.0f-lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 16-1){
             TextRendering_PrintString(window, "Mapeamento de textura Esferica:", -1.0f, 1.0f-lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 17-1){
             TextRendering_PrintString(window, "Mapeamento de textura Cilindrica:", -1.0f, 1.0f-lineheight, 1.0f);
-        } else 
+        } else
         if (estande_atual == 18-1){
             TextRendering_PrintString(window, "Interseccao de objetos:", -1.0f, 1.0f-lineheight, 1.0f);
             TextRendering_PrintString(window, "   A partir das teclas A e D podes alterar a posicao do objeto a ser solto.", -1.0f, 1.0f-2*lineheight, 1.0f);
             TextRendering_PrintString(window, "   Apos definir sua posicao de queda, solta-o ao apertar a tecla ENTER.", -1.0f, 1.0f-3*lineheight, 1.0f);
-            TextRendering_PrintString(window, "       O processo eh reiciciado ao pressionar a tecla ENTER no apos a soltar os 5 objetos.", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "       O processo eh reiciciado ao pressionar a tecla ENTER no apos a soltar os 5 objetos.", -1.0f, 1.0f-4*lineheight, 1.0f);
         }
     }
 }
