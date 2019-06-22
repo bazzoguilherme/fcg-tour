@@ -137,6 +137,7 @@ template <typename T> int sgn(T val);
 bool check_inside_museum(float x, float z);
 float F_p1_p2(glm::vec3 v, glm::vec3 a, float x, float z);
 
+float absolute_float(float v);
 glm::vec4 bezier(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4);
 bool interseccao_caixa_caixa(struct box_obj obj1, struct box_obj obj2);
 bool interseccao_esfera_esfera(struct sphere_obj obj1, struct sphere_obj obj2);
@@ -900,15 +901,15 @@ int main(int argc, char* argv[])
 
         struct box_obj obj1;
         obj1.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
-        obj1.x_size = abs(obj1.c.x) - abs(posMin.x);
-        obj1.y_size = abs(obj1.c.y) - abs(posMin.y);
-        obj1.z_size = abs(obj1.c.z) - abs(posMin.z);
+        obj1.x_size = absolute_float(posMax.x - obj1.c.x);
+        obj1.y_size = absolute_float(posMax.y - obj1.c.y);
+        obj1.z_size = absolute_float(posMax.z - obj1.c.z);
 
 
 
 
 
-        model = Matrix_Translate(posicoes_estandes[18-1].x, posicoes_estandes[18-1].y + 4.5f /*+ object_fall*/, posicoes_estandes[18-1].z - 0.3f)
+        model = Matrix_Translate(posicoes_estandes[18-1].x + 0.1f, posicoes_estandes[18-1].y + 5.0f /*+ object_fall*/, posicoes_estandes[18-1].z - 0.3f)
               * Matrix_Scale(0.08f, 0.08f, 0.08f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, CUBO);
@@ -922,12 +923,13 @@ int main(int argc, char* argv[])
         posMin = model * obj_min_vec4;
         posMax = model * obj_max_vec4;
 
+        //printf("MIN: x: %f / y: %f / z: %f\n", posMin.x, posMin.y, posMin.z);
+
         struct box_obj obj2;
         obj2.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
-        obj2.x_size = abs(obj2.c.x) - abs(posMin.x);
-        obj2.y_size = abs(obj2.c.y) - abs(posMin.y);
-        printf("Y: %f\n", obj2.y_size);
-        obj2.z_size = abs(obj2.c.z) - abs(posMin.z);
+        obj2.x_size = absolute_float(posMax.x - obj2.c.x);
+        obj2.y_size = absolute_float(posMax.y - obj2.c.y);
+        obj2.z_size = absolute_float(posMax.z - obj2.c.z);
 
         if (interseccao_caixa_caixa(obj1, obj2)){
             printf("INTERSECAO\n");
@@ -986,13 +988,15 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+float absolute_float(float v){
+    if (v < 0){
+        return -v;
+    }
+    return v;
+}
+
 glm::vec4 bezier(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4)
 {
-
-    // glm::vec4 p1 (p1.x, p1.y, p1.z, 1.0f);
-    // glm::vec4 p2 (p2.x, p2.y, p2.z, 1.0f);
-    // glm::vec4 p3 (p3.x, p3.y, p3.z, 1.0f);
-    // glm::vec4 p4 (p4.x, p4.y, p4.z, 1.0f);
 
     glm::vec4 c12 = p1 + t*(p2-p1);
     glm::vec4 c23 = p2 + t*(p3-p2);
@@ -1022,11 +1026,17 @@ void load_look_at_camera(){
 
 bool interseccao_caixa_caixa(struct box_obj obj1, struct box_obj obj2){
     glm::vec3 distancia_centros = (obj1.c - obj2.c);
+    
+    // printf("x: %f // y: %f // z: %f\n", distancia_centros.x, distancia_centros.y, distancia_centros.z);
+    // printf("1y centro: %f\n", obj1.c.y);
+    // printf("1x size : %f\n", obj1.x_size);
+    // printf("2y centro: %f\n", obj2.c.y);
+    // printf("2x size: %f\n", obj2.x_size);
 
-    bool x_dist = abs(distancia_centros.x) <= (obj1.x_size + obj2.x_size);
-    bool y_dist = abs(distancia_centros.y) <= (obj1.y_size + obj2.y_size);
-    bool z_dist = abs(distancia_centros.z) <= (obj1.z_size + obj2.z_size);
-    printf("%d - %f - %d\n", x_dist, obj1.y_size + obj2.y_size, z_dist);
+    bool x_dist = absolute_float(distancia_centros.x) <= (obj1.x_size + obj2.x_size);
+    bool y_dist = absolute_float(distancia_centros.y) <= (obj1.y_size + obj2.y_size);
+    bool z_dist = absolute_float(distancia_centros.z) <= (obj1.z_size + obj2.z_size);
+    //printf("%d - %f - %d\n", x_dist, obj1.x_size + obj2.x_size, z_dist);
     return (x_dist && y_dist && z_dist);
 }
 
