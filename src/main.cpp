@@ -257,10 +257,20 @@ int direcao_textura_plana = 1;
 
 int obj_atual_stand18 = 1;
 float cai_obj1 = 0.0f;
+float move_obj1 = 0.0f;
+bool libera_obj1 = false;
 float cai_obj2 = 0.0f;
+float move_obj2 = 0.0f;
+bool libera_obj2 = false;
 float cai_obj3 = 0.0f;
+float move_obj3 = 0.0f;
+bool libera_obj3 = false;
 float cai_obj4 = 0.0f;
+bool libera_obj4 = false;
+float move_obj4 = 0.0f;
 float cai_obj5 = 0.0f;
+bool libera_obj5 = false;
+float move_obj5 = 0.0f;
 
 struct square_bbox{
     glm::vec3   p1;
@@ -917,11 +927,16 @@ int main(int argc, char* argv[])
         obj_plano.x_size = absolute_float(posMax.x - obj_plano.c.x);
         obj_plano.z_size = absolute_float(posMax.z - obj_plano.c.z);
 
+        struct box_obj obj_caixa1;
+        struct box_obj obj_caixa2;
+        struct sphere_obj obj_esfera1;
+        struct sphere_obj obj_esfera2;
+        struct box_obj obj_caixa3;
 
         // cubo 1
         if (obj_atual_stand18 >= 1){
-            model = Matrix_Translate(posicoes_estandes[18-1].x, posicoes_estandes[18-1].y + 5.0f - cai_obj1, posicoes_estandes[18-1].z - 0.3f)
-                * Matrix_Scale(0.08f, 0.08f, 0.08f);
+            model = Matrix_Translate(posicoes_estandes[18-1].x + move_obj1, posicoes_estandes[18-1].y + 5.0f - cai_obj1, posicoes_estandes[18-1].z - 0.3f)
+                * Matrix_Scale(0.1f, 0.1f, 0.1f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, CUBO);
             DrawVirtualObject("cubo");
@@ -934,25 +949,26 @@ int main(int argc, char* argv[])
             posMin = model * obj_min_vec4;
             posMax = model * obj_max_vec4;
 
-            struct box_obj obj_caixa1;
             obj_caixa1.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
             obj_caixa1.x_size = absolute_float(posMax.x - obj_caixa1.c.x);
             obj_caixa1.y_size = absolute_float(posMax.y - obj_caixa1.c.y);
             obj_caixa1.z_size = absolute_float(posMax.z - obj_caixa1.c.z);
 
-            if (!interseccao_caixa_plano(obj_caixa1, obj_plano)){
-                cai_obj1 += passo_tempo/2.0f;
-            } else {
-                obj_atual_stand18 = 2;
-            }
+
+            if (estande_atual == 18-1 && libera_obj1)
+                if (!interseccao_caixa_plano(obj_caixa1, obj_plano)){
+                    cai_obj1 += passo_tempo/2.0f;
+                } else {
+                    obj_atual_stand18 = 2;
+                }
 
 
         }
 
         // cubo 2
         if (obj_atual_stand18 >=2){
-            model = Matrix_Translate(posicoes_estandes[18-1].x + 0.1f, posicoes_estandes[18-1].y + 5.0f /*+ object_fall*/, posicoes_estandes[18-1].z - 0.3f)
-                * Matrix_Scale(0.08f, 0.08f, 0.08f);
+            model = Matrix_Translate(posicoes_estandes[18-1].x + move_obj2, posicoes_estandes[18-1].y + 5.0f - cai_obj2, posicoes_estandes[18-1].z - 0.3f)
+                * Matrix_Scale(0.09f, 0.09f, 0.09f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, CUBO);
             DrawVirtualObject("cubo");
@@ -965,17 +981,23 @@ int main(int argc, char* argv[])
             posMin = model * obj_min_vec4;
             posMax = model * obj_max_vec4;
 
-            struct box_obj obj_caixa2;
             obj_caixa2.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
             obj_caixa2.x_size = absolute_float(posMax.x - obj_caixa2.c.x);
             obj_caixa2.y_size = absolute_float(posMax.y - obj_caixa2.c.y);
             obj_caixa2.z_size = absolute_float(posMax.z - obj_caixa2.c.z);
+
+            if (estande_atual == 18-1 && libera_obj2)
+                if (!interseccao_caixa_plano(obj_caixa2, obj_plano) && !interseccao_caixa_caixa(obj_caixa2, obj_caixa1)){
+                    cai_obj2 += passo_tempo/2.0f;
+                } else {
+                    obj_atual_stand18 = 3;
+                }
         }
 
         // esfera 1
         if (obj_atual_stand18 >= 3){
-            model = Matrix_Translate(posicoes_estandes[18-1].x + 0.5, posicoes_estandes[18-1].y + 5.0f, posicoes_estandes[18-1].z - 0.3f)
-                * Matrix_Scale(0.12f, 0.12f, 0.12f);
+            model = Matrix_Translate(posicoes_estandes[18-1].x + move_obj3, posicoes_estandes[18-1].y + 5.0f - cai_obj3, posicoes_estandes[18-1].z - 0.3f)
+                * Matrix_Scale(0.1f, 0.1f, 0.1f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, ESFERA);
             DrawVirtualObject("esfera");
@@ -988,15 +1010,22 @@ int main(int argc, char* argv[])
             posMin = model * obj_min_vec4;
             posMax = model * obj_max_vec4;
 
-            struct sphere_obj obj_esfera1;
             obj_esfera1.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
             obj_esfera1.r = absolute_float(posMax.x - obj_esfera1.c.x);
+
+            if (estande_atual == 18-1 && libera_obj3)
+                if (!interseccao_esfera_plano(obj_esfera1, obj_plano) && !interseccao_caixa_esfera(obj_caixa1, obj_esfera1) &&
+                        !interseccao_caixa_esfera(obj_caixa2, obj_esfera1)){
+                    cai_obj3 += passo_tempo/2.0f;
+                } else {
+                    obj_atual_stand18 = 4;
+                }
         }
 
         //esfera 2
         if (obj_atual_stand18 >= 4){
-            model = Matrix_Translate(posicoes_estandes[18-1].x + 0.5, posicoes_estandes[18-1].y + 4.9f, posicoes_estandes[18-1].z - 0.3f)
-                * Matrix_Scale(0.12f, 0.12f, 0.12f);
+            model = Matrix_Translate(posicoes_estandes[18-1].x + move_obj4, posicoes_estandes[18-1].y + 5.0f - cai_obj4, posicoes_estandes[18-1].z - 0.3f)
+                * Matrix_Scale(0.1f, 0.1f, 0.1f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, ESFERA);
             DrawVirtualObject("esfera");
@@ -1009,11 +1038,48 @@ int main(int argc, char* argv[])
             posMin = model * obj_min_vec4;
             posMax = model * obj_max_vec4;
 
-            struct sphere_obj obj4;
-            obj4.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
-            obj4.r = absolute_float(posMax.x - obj4.c.x);
+            obj_esfera2.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
+            obj_esfera2.r = absolute_float(posMax.x - obj_esfera2.c.x);
+
+            if (estande_atual == 18-1 && libera_obj4)
+                if (!interseccao_esfera_plano(obj_esfera2, obj_plano) && !interseccao_caixa_esfera(obj_caixa1, obj_esfera2) &&
+                        !interseccao_caixa_esfera(obj_caixa2, obj_esfera2) && !interseccao_esfera_esfera(obj_esfera1, obj_esfera2)){
+                    cai_obj4 += passo_tempo/2.0f;
+                } else {
+                    obj_atual_stand18 = 5;
+                }
         }
 
+
+        // cubo 5
+        if (obj_atual_stand18 >=5){
+            model = Matrix_Translate(posicoes_estandes[18-1].x + move_obj5, posicoes_estandes[18-1].y + 5.0f - cai_obj5, posicoes_estandes[18-1].z - 0.3f)
+                * Matrix_Scale(0.1f, 0.1f, 0.1f);
+            glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(object_id_uniform, CUBO);
+            DrawVirtualObject("cubo");
+
+            obj_min = g_VirtualScene["cubo"].bbox_min;
+            obj_max = g_VirtualScene["cubo"].bbox_max;
+            obj_min_vec4 = glm::vec4(obj_min.x, obj_min.y, obj_min.z, 1.0f);
+            obj_max_vec4 = glm::vec4(obj_max.x, obj_max.y, obj_max.z, 1.0f);
+
+            posMin = model * obj_min_vec4;
+            posMax = model * obj_max_vec4;
+
+            obj_caixa3.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
+            obj_caixa3.x_size = absolute_float(posMax.x - obj_caixa3.c.x);
+            obj_caixa3.y_size = absolute_float(posMax.y - obj_caixa3.c.y);
+            obj_caixa3.z_size = absolute_float(posMax.z - obj_caixa3.c.z);
+
+            if (estande_atual == 18-1 && libera_obj5)
+                if (!interseccao_caixa_plano(obj_caixa3, obj_plano) && !interseccao_caixa_caixa(obj_caixa3, obj_caixa1) && !interseccao_caixa_caixa(obj_caixa3, obj_caixa2) &&
+                        !interseccao_caixa_esfera(obj_caixa3, obj_esfera1) && !interseccao_caixa_esfera(obj_caixa3, obj_esfera2) ){
+                    cai_obj5 += passo_tempo/2.0f;
+                } else {
+                    obj_atual_stand18 = 6;
+                }
+        }
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
@@ -1112,11 +1178,50 @@ bool interseccao_esfera_esfera(struct sphere_obj obj1, struct sphere_obj obj2){
 bool interseccao_caixa_esfera(struct box_obj caixa, struct sphere_obj esfera){
     glm::vec3 distancia_centros = (caixa.c - esfera.c);
 
-    bool x_dist = absolute_float(distancia_centros.x) <= (caixa.x_size + esfera.r);
-    bool y_dist = absolute_float(distancia_centros.y) <= (caixa.y_size + esfera.r);
-    bool z_dist = absolute_float(distancia_centros.z) <= (caixa.z_size + esfera.r);
+    // float d = sqrt( pow(caixa.x_size, 2) + pow(caixa.y_size, 2) + pow(caixa.z_size, 2) );
+    // float dist_c = sqrt( pow(distancia_centros.x, 2) + pow(distancia_centros.y, 2) + pow(distancia_centros.z, 2));
+    // if (dist_c <= d + esfera.r){
+    //     return true;
+    // }
 
-    return (x_dist && y_dist && z_dist);
+    if (absolute_float(distancia_centros.x) > (caixa.x_size + esfera.r)){
+        return false;
+    }
+    if (absolute_float(distancia_centros.y) > (caixa.y_size + esfera.r)){
+        return false;
+    }
+    if (absolute_float(distancia_centros.z) > (caixa.z_size + esfera.r)){
+        return false;
+    }
+
+
+    if (absolute_float(distancia_centros.x) <= caixa.x_size ){
+        return true;
+    }
+    if (absolute_float(distancia_centros.y) <= caixa.y_size ){
+        return true;
+    }
+    if (absolute_float(distancia_centros.z) <= caixa.z_size ){
+        return true;
+    }
+
+    return ( pow(distancia_centros.x - caixa.x_size, 2) + pow(distancia_centros.y - caixa.y_size, 2) )
+                        <= pow(esfera.r, 2);
+    // return false;
+
+
+    // bool x_dist = absolute_float(distancia_centros.x) <= (caixa.x_size + esfera.r);
+    // bool y_dist = absolute_float(distancia_centros.y) <= (caixa.y_size + esfera.r);
+    // bool z_dist = absolute_float(distancia_centros.z) <= (caixa.z_size + esfera.r);
+
+    // float d = sqrt( pow(caixa.x_size, 2) + pow(caixa.y_size, 2) /*+ pow(caixa.z_size, 2)  */);
+    // float dist_c = sqrt( pow(distancia_centros.x, 2) + pow(distancia_centros.y, 2) + pow(distancia_centros.z, 2));
+    // if (dist_c <= d + esfera.r){
+    //     if (!(x_dist && y_dist && z_dist))
+    //     return true;
+    // }
+
+    // return (x_dist && y_dist && z_dist);
 }
 
 bool interseccao_caixa_plano(struct box_obj caixa, struct plane_obj plano){
@@ -1937,7 +2042,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             glfwSetWindowShouldClose(window, GL_TRUE);
     }
 
-    if (key == GLFW_KEY_ENTER && action == GLFW_PRESS){
+    if (key == GLFW_KEY_ENTER && action == GLFW_PRESS && camera_view_ID == FREE_CAMERA){
         load_look_at_camera();
     }
 
@@ -2211,6 +2316,88 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
             g_scaleZ_5 = 0.5f;
         }
     }
+
+    // ESTANTE 18
+    if (camera_view_ID == LOOK_AT_CAMERA && estande_atual == 18-1){
+        if (key == GLFW_KEY_ENTER && action == GLFW_PRESS && obj_atual_stand18 == 1){
+            libera_obj1 = true;
+        }
+        if (key == GLFW_KEY_ENTER && action == GLFW_PRESS && obj_atual_stand18 == 2){
+            libera_obj2 = true;
+        }
+        if (key == GLFW_KEY_ENTER && action == GLFW_PRESS && obj_atual_stand18 == 3){
+            libera_obj3 = true;
+        }
+        if (key == GLFW_KEY_ENTER && action == GLFW_PRESS && obj_atual_stand18 == 4){
+            libera_obj4 = true;
+        }
+        if (key == GLFW_KEY_ENTER && action == GLFW_PRESS && obj_atual_stand18 == 5){
+            libera_obj5 = true;
+        }
+
+        if (key == GLFW_KEY_ENTER && action == GLFW_PRESS && obj_atual_stand18 == 6){
+            libera_obj1 = false;
+            libera_obj2 = false;
+            libera_obj3 = false;
+            libera_obj4 = false;
+            libera_obj5 = false;
+
+            move_obj1 = 0.0f;
+            move_obj2 = 0.0f;
+            move_obj3 = 0.0f;
+            move_obj4 = 0.0f;
+            move_obj5 = 0.0f;
+
+            cai_obj1 = 0.0f;
+            cai_obj2 = 0.0f;
+            cai_obj3 = 0.0f;
+            cai_obj4 = 0.0f;
+            cai_obj5 = 0.0f;
+
+            obj_atual_stand18 = 1;
+        }
+
+
+        float movement = 0.1f;
+        float limit_movement = 0.45f;
+        if (key == GLFW_KEY_A && action == GLFW_PRESS && obj_atual_stand18 == 1){
+            move_obj1 += (move_obj1 < limit_movement && !libera_obj1) ? movement : 0.0f;
+        }
+        if (key == GLFW_KEY_D && action == GLFW_PRESS && obj_atual_stand18 == 1){
+            move_obj1 -= (move_obj1 > -limit_movement && !libera_obj1) ? movement : 0.0f;
+        }
+
+        if (key == GLFW_KEY_A && action == GLFW_PRESS && obj_atual_stand18 == 2){
+            move_obj2 += (move_obj2 < limit_movement && !libera_obj2) ? movement : 0.0f;
+        }
+        if (key == GLFW_KEY_D && action == GLFW_PRESS && obj_atual_stand18 == 2){
+            move_obj2 -= (move_obj2 > -limit_movement && !libera_obj2) ? movement : 0.0f;
+        }
+
+        if (key == GLFW_KEY_A && action == GLFW_PRESS && obj_atual_stand18 == 3){
+            move_obj3 += (move_obj3 < limit_movement && !libera_obj3) ? movement : 0.0f;
+        }
+        if (key == GLFW_KEY_D && action == GLFW_PRESS && obj_atual_stand18 == 3){
+            move_obj3 -= (move_obj3 > -limit_movement && !libera_obj3) ? movement : 0.0f;
+        }
+
+        if (key == GLFW_KEY_A && action == GLFW_PRESS && obj_atual_stand18 == 4){
+            move_obj4 += (move_obj4 < limit_movement && !libera_obj4) ? movement : 0.0f;
+        }
+        if (key == GLFW_KEY_D && action == GLFW_PRESS && obj_atual_stand18 == 4){
+            move_obj4 -= (move_obj4 > -limit_movement && !libera_obj4) ? movement : 0.0f;
+        }
+
+        if (key == GLFW_KEY_A && action == GLFW_PRESS && obj_atual_stand18 == 5){
+            move_obj5 += (move_obj5 < limit_movement && !libera_obj5) ? movement : 0.0f;
+        }
+        if (key == GLFW_KEY_D && action == GLFW_PRESS && obj_atual_stand18 == 5){
+            move_obj5 -= (move_obj5 > -limit_movement && !libera_obj5) ? movement : 0.0f;
+        }
+
+    }
+
+
 }
 
 // Definimos o callback para impressão de erros da GLFW no terminal
