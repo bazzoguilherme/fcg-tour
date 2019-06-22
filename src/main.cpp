@@ -124,6 +124,8 @@ void TextRendering_ShowEulerAngles(GLFWwindow* window);
 void TextRendering_ShowProjection(GLFWwindow* window);
 void TextRendering_ShowFramesPerSecond(GLFWwindow* window);
 
+void informative_text_stand(GLFWwindow* window);
+
 // Funções callback para comunicação com o sistema operacional e interação do
 // usuário. Veja mais comentários nas definições das mesmas, abaixo.
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -245,7 +247,7 @@ float y;
 float z;
 float x;
 
-#define QUANT_ESTANDE 20
+#define QUANT_ESTANDE 18
 std::vector<glm::vec4> posicoes_estandes;
 int estande_atual = 0;
 
@@ -411,8 +413,8 @@ int main(int argc, char* argv[])
         LoadTextureImage(filepath);
 
         if(*iterator_obj_names == "estande"){
-            LoadTextureImage("../../data/estande_acerto");
             LoadTextureImage("../../data/estande_erro");
+            LoadTextureImage("../../data/estande_acerto");
         } else if(*iterator_obj_names == "lampada"){
             LoadTextureImage("../../data/vermelho");
             LoadTextureImage("../../data/azul");
@@ -647,8 +649,8 @@ int main(int argc, char* argv[])
         glm::vec4 posMax;
 
 
-        model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
-              * Matrix_Scale(25.0f, 6.0f, 12.0f);
+        model = Matrix_Translate(-21.5f, 1.0f, 0.0f)
+              * Matrix_Scale(24.0f, 6.0f, 12.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, MUSEU);
         DrawVirtualObject("museu");
@@ -667,14 +669,14 @@ int main(int argc, char* argv[])
         Museu.p4 = glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMax.z - ERRO_COLISAO);
 
 
-        for (float estandes = 0; estandes<10*4; estandes+=4){
-            model = Matrix_Translate(-1.2f*estandes, -4.8f, -11.0f)
+        for (float estandes = 0; estandes<9*4; estandes+=4){
+            model = Matrix_Translate(-1.32f*estandes, -4.8f, -11.0f)
                   * Matrix_Scale(0.95f, 1.2f, 0.95f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, ESTANDE);
             DrawVirtualObject("estande");
 
-            posicoes_estandes.push_back(glm::vec4(-1.2f*estandes, -4.8f, -11.0f, 1.0f));
+            posicoes_estandes.push_back(glm::vec4(-1.32f*estandes, -4.8f, -11.0f, 1.0f));
 
             glm::vec3 estande_min = g_VirtualScene["estande"].bbox_min;
             glm::vec3 estande_max = g_VirtualScene["estande"].bbox_max;
@@ -694,15 +696,15 @@ int main(int argc, char* argv[])
             estandes_bbox.push_back(estande);
         }
 
-        for (float estandes = 0; estandes<10*4; estandes+=4){
-            model = Matrix_Translate(-1.2f*estandes, -4.8f, 11.0f)
+        for (float estandes = 0; estandes<9*4; estandes+=4){
+            model = Matrix_Translate(-1.32f*estandes, -4.8f, 11.0f)
                   * Matrix_Scale(0.95f, 1.2f, 0.95f)
                   * Matrix_Rotate_Y(M_PI);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, ESTANDE);
             DrawVirtualObject("estande");
 
-            posicoes_estandes.push_back(glm::vec4(-1.2f*estandes, -4.8f, 11.0f, 1.0f));
+            posicoes_estandes.push_back(glm::vec4(-1.32f*estandes, -4.8f, 11.0f, 1.0f));
 
             glm::vec3 estande_min = g_VirtualScene["estande"].bbox_min;
             glm::vec3 estande_max = g_VirtualScene["estande"].bbox_max;
@@ -968,7 +970,7 @@ int main(int argc, char* argv[])
         // cubo 2
         if (obj_atual_stand18 >=2){
             model = Matrix_Translate(posicoes_estandes[18-1].x + move_obj2, posicoes_estandes[18-1].y + 5.0f - cai_obj2, posicoes_estandes[18-1].z - 0.3f)
-                * Matrix_Scale(0.09f, 0.09f, 0.09f);
+                * Matrix_Scale(0.1f, 0.1f, 0.1f);
             glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(object_id_uniform, CUBO);
             DrawVirtualObject("cubo");
@@ -1081,6 +1083,7 @@ int main(int argc, char* argv[])
                 }
         }
 
+        informative_text_stand(window);
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
         // passamos por todos os sistemas de coordenadas armazenados nas
@@ -2702,6 +2705,95 @@ void PrintObjModelInfo(ObjModel* model)
     printf("\n");
   }
 }
+
+void informative_text_stand(GLFWwindow* window){
+
+    float lineheight = TextRendering_LineHeight(window);
+    float charwidth = TextRendering_CharWidth(window);
+    
+    if (camera_view_ID == LOOK_AT_CAMERA){
+        if (estande_atual == 1-1){
+            TextRendering_PrintString(window, "Imagem Real ou feita por Computacao Grafica?", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "     1: Real", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "     2: Computacao Grafica", -1.0f, 1.0f-3*lineheight, 1.0f);
+        } else 
+        if (estande_atual == 2-1){
+            TextRendering_PrintString(window, "Vetores:", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "     Utilizando as teclas cima/baixo, altera direcao do vetor azul.", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "     Ao alterar sua direcao, notamos que a soma dos vetores (identificado pelo vetor preto) tambem eh alterada.", -1.0f, 1.0f-3*lineheight, 1.0f);
+        } else 
+        if (estande_atual == 3-1){
+            TextRendering_PrintString(window, "Transformacoes Hierarquicas:", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "     .", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "     .", -1.0f, 1.0f-3*lineheight, 1.0f);
+        } else 
+        if (estande_atual == 4-1){
+            TextRendering_PrintString(window, "Normais:", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "     Quando o triangulo esta virado para camera, podemos visualiza-lo.", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "     Porem, quando esta virado ao contrario, nao o vemos.", -1.0f, 1.0f-3*lineheight, 1.0f);
+        } else 
+        if (estande_atual == 5-1){
+            TextRendering_PrintString(window, "Transformacoes:", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "     .", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "     .", -1.0f, 1.0f-3*lineheight, 1.0f);
+        } else 
+        if (estande_atual == 6-1){
+            TextRendering_PrintString(window, "Euler Angles / Gimbal Lock:", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "     Utilizando as teclas X,Y,Z podes alterar os angulos sobre o cubo.", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "     Ao pressionar a tecla G definimos o angulo y para Gimbal Lock, trancado as rotacoes ", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "       para duas-dimensoes degeneradas, sobre x e z.", -1.0f, 1.0f-4*lineheight, 1.0f);
+        } else 
+        if (estande_atual == 7-1){
+            TextRendering_PrintString(window, "Projecoes:", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "     Podes alterar o tipo de projecao utilizando as teclas O e P, ", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "       para projecoes ortograficas e perspectivas, respectivamente.", -1.0f, 1.0f-3*lineheight, 1.0f);
+        } else 
+        if (estande_atual == 8-1){
+            TextRendering_PrintString(window, "Z-fighting:", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "     Ao termos 2 ou mais objetos com valores no z-buffer similares ou iguais", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "       temos este fenomeno, em que a imagem fica tremulante.", -1.0f, 1.0f-3*lineheight, 1.0f);
+        } else 
+        if (estande_atual == 9-1){
+            TextRendering_PrintString(window, "Curvas de Bezier:", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "     Objeto se movendo na tela sobre a estande a partir de curvas de Bezier.", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "     *Alterar pontos*.", -1.0f, 1.0f-3*lineheight, 1.0f);
+        } else 
+        if (estande_atual == 10-1){
+            TextRendering_PrintString(window, "Alteracao de textura:", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "     Podes aqui alterar a textura sobre a lampada com as teclas 1-6.", -1.0f, 1.0f-2*lineheight, 1.0f);
+        } else 
+        if (estande_atual == 11-1){
+            TextRendering_PrintString(window, "Flat Shading:", -1.0f, 1.0f-lineheight, 1.0f);
+        } else 
+        if (estande_atual == 12-1){
+            TextRendering_PrintString(window, "Gouraud Shading:", -1.0f, 1.0f-lineheight, 1.0f);
+        } else 
+        if (estande_atual == 13-1){
+            TextRendering_PrintString(window, "Phong Shading:", -1.0f, 1.0f-lineheight, 1.0f);
+        } else 
+        if (estande_atual == 14-1){
+            TextRendering_PrintString(window, "Mapeamento de textura Planar:", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "     Podes mudar de direcao de projecao com as teclas 1/2/3, ", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "     sendo elas (x,y), (x,z) e (y,z) respectivamente.", -1.0f, 1.0f-3*lineheight, 1.0f);
+        } else 
+        if (estande_atual == 15-1){
+            TextRendering_PrintString(window, "Mapeamento de textura Cubica:", -1.0f, 1.0f-lineheight, 1.0f);
+        } else 
+        if (estande_atual == 16-1){
+            TextRendering_PrintString(window, "Mapeamento de textura Esferica:", -1.0f, 1.0f-lineheight, 1.0f);
+        } else 
+        if (estande_atual == 17-1){
+            TextRendering_PrintString(window, "Mapeamento de textura Cilindrica:", -1.0f, 1.0f-lineheight, 1.0f);
+        } else 
+        if (estande_atual == 18-1){
+            TextRendering_PrintString(window, "Interseccao de objetos:", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "     A partir das teclas A e D podes alterar a posicao do objeto a ser solto.", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "     Apos definir sua posicao de queda, solta-o ao apertar a tecla ENTER.", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "         O processo eh reiciciado ao pressionar a tecla ENTER no apos a soltar os 5 objetos.", -1.0f, 1.0f-3*lineheight, 1.0f);
+        }
+    }
+}
+
 
 // set makeprg=cd\ ..\ &&\ make\ run\ >/dev/null
 // vim: set spell spelllang=pt_br :
