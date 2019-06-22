@@ -141,6 +141,9 @@ float absolute_float(float v);
 glm::vec4 bezier(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4);
 bool interseccao_caixa_caixa(struct box_obj obj1, struct box_obj obj2);
 bool interseccao_esfera_esfera(struct sphere_obj obj1, struct sphere_obj obj2);
+bool interseccao_caixa_esfera(struct box_obj caixa, struct sphere_obj esfera);
+bool interseccao_caixa_plano(struct box_obj caixa, struct plane_obj plano);
+bool interseccao_esfera_plano(struct sphere_obj esfera, struct plane_obj plano);
 bool check_colision(float x, float z);
 
 // Definimos uma estrutura que armazenará dados necessários para renderizar
@@ -251,6 +254,13 @@ int opcao_estande1 = 0;
 int cor_lampada = 1;
 
 int direcao_textura_plana = 1;
+
+int obj_atual_stand18 = 1;
+float cai_obj1 = 0.0f;
+float cai_obj2 = 0.0f;
+float cai_obj3 = 0.0f;
+float cai_obj4 = 0.0f;
+float cai_obj5 = 0.0f;
 
 struct square_bbox{
     glm::vec3   p1;
@@ -619,6 +629,14 @@ int main(int argc, char* argv[])
         #define VETOR_RESULTANTE 17
         #define PLANO 18
 
+        glm::vec3 obj_min;
+        glm::vec3 obj_max;
+        glm::vec4 obj_min_vec4;
+        glm::vec4 obj_max_vec4;
+        glm::vec4 posMin;
+        glm::vec4 posMax;
+
+
         model = Matrix_Translate(-22.0f, 1.0f, 0.0f)
               * Matrix_Scale(25.0f, 6.0f, 12.0f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
@@ -630,8 +648,8 @@ int main(int argc, char* argv[])
         glm::vec4 museu_min_vec4 = glm::vec4(museu_min.x, museu_min.y, museu_min.z, 1.0f);
         glm::vec4 museu_max_vec4 = glm::vec4(museu_max.x, museu_max.y, museu_max.z, 1.0f);
 
-        glm::vec4 posMin = model * museu_min_vec4;
-        glm::vec4 posMax = model * museu_max_vec4;
+        posMin = model * museu_min_vec4;
+        posMax = model * museu_max_vec4;
 
         Museu.p1 = glm::vec3(posMin.x + ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO);
         Museu.p2 = glm::vec3(posMax.x - ERRO_COLISAO, 1.0f, posMin.z + ERRO_COLISAO);
@@ -878,106 +896,124 @@ int main(int argc, char* argv[])
 
 
         // estande 18
+
+        // plano
         model = Matrix_Translate(posicoes_estandes[18-1].x, posicoes_estandes[18-1].y + 3.8f, posicoes_estandes[18-1].z - 0.3f)
               * Matrix_Scale(0.65f, 0.6f, 0.46f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(object_id_uniform, PLANO);
         DrawVirtualObject("plano");
 
-
-        model = Matrix_Translate(posicoes_estandes[18-1].x, posicoes_estandes[18-1].y + 5.0f /*+ object_fall*/, posicoes_estandes[18-1].z - 0.3f)
-              * Matrix_Scale(0.08f, 0.08f, 0.08f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, CUBO);
-        DrawVirtualObject("cubo");
-
-        glm::vec3 obj_min = g_VirtualScene["cubo"].bbox_min;
-        glm::vec3 obj_max = g_VirtualScene["cubo"].bbox_max;
-        glm::vec4 obj_min_vec4 = glm::vec4(obj_min.x, obj_min.y, obj_min.z, 1.0f);
-        glm::vec4 obj_max_vec4 = glm::vec4(obj_max.x, obj_max.y, obj_max.z, 1.0f);
-
-        posMin = model * obj_min_vec4;
-        posMax = model * obj_max_vec4;
-
-        struct box_obj obj1;
-        obj1.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
-        obj1.x_size = absolute_float(posMax.x - obj1.c.x);
-        obj1.y_size = absolute_float(posMax.y - obj1.c.y);
-        obj1.z_size = absolute_float(posMax.z - obj1.c.z);
-
-
-
-        // model = Matrix_Translate(posicoes_estandes[18-1].x + 0.1f, posicoes_estandes[18-1].y + 5.0f /*+ object_fall*/, posicoes_estandes[18-1].z - 0.3f)
-        //       * Matrix_Scale(0.08f, 0.08f, 0.08f);
-        // glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        // glUniform1i(object_id_uniform, CUBO);
-        // DrawVirtualObject("cubo");
-
-        // obj_min = g_VirtualScene["cubo"].bbox_min;
-        // obj_max = g_VirtualScene["cubo"].bbox_max;
-        // obj_min_vec4 = glm::vec4(obj_min.x, obj_min.y, obj_min.z, 1.0f);
-        // obj_max_vec4 = glm::vec4(obj_max.x, obj_max.y, obj_max.z, 1.0f);
-
-        // posMin = model * obj_min_vec4;
-        // posMax = model * obj_max_vec4;
-
-        //printf("MIN: x: %f / y: %f / z: %f\n", posMin.x, posMin.y, posMin.z);
-
-        // struct box_obj obj2;
-        // obj2.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
-        // obj2.x_size = absolute_float(posMax.x - obj2.c.x);
-        // obj2.y_size = absolute_float(posMax.y - obj2.c.y);
-        // obj2.z_size = absolute_float(posMax.z - obj2.c.z);
-
-        // if (interseccao_caixa_caixa(obj1, obj2)){
-        //     printf("INTERSECAO\n");
-        // } else {
-        //     printf("NOOOOO\n");
-        // }
-
-        // esfera teste 1
-        model = Matrix_Translate(posicoes_estandes[18-1].x + 0.5, posicoes_estandes[18-1].y + 5.0f, posicoes_estandes[18-1].z - 0.3f)
-              * Matrix_Scale(0.12f, 0.12f, 0.12f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESFERA);
-        DrawVirtualObject("esfera");
-
-        obj_min = g_VirtualScene["esfera"].bbox_min;
-        obj_max = g_VirtualScene["esfera"].bbox_max;
+        obj_min = g_VirtualScene["plano"].bbox_min;
+        obj_max = g_VirtualScene["plano"].bbox_max;
         obj_min_vec4 = glm::vec4(obj_min.x, obj_min.y, obj_min.z, 1.0f);
         obj_max_vec4 = glm::vec4(obj_max.x, obj_max.y, obj_max.z, 1.0f);
 
         posMin = model * obj_min_vec4;
         posMax = model * obj_max_vec4;
 
-        struct sphere_obj obj3;
-        obj3.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
-        obj3.r = absolute_float(posMax.x - obj3.c.x);
+        struct plane_obj obj_plano;
+        obj_plano.c = glm::vec3( (posMin.x + posMax.x)/2.0f, (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
+        obj_plano.x_size = absolute_float(posMax.x - obj_plano.c.x);
+        obj_plano.z_size = absolute_float(posMax.z - obj_plano.c.z);
 
-        //esfera teste 2
-        model = Matrix_Translate(posicoes_estandes[18-1].x + 0.5, posicoes_estandes[18-1].y + 4.9f, posicoes_estandes[18-1].z - 0.3f)
-              * Matrix_Scale(0.12f, 0.12f, 0.12f);
-        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESFERA);
-        DrawVirtualObject("esfera");
 
-        obj_min = g_VirtualScene["esfera"].bbox_min;
-        obj_max = g_VirtualScene["esfera"].bbox_max;
-        obj_min_vec4 = glm::vec4(obj_min.x, obj_min.y, obj_min.z, 1.0f);
-        obj_max_vec4 = glm::vec4(obj_max.x, obj_max.y, obj_max.z, 1.0f);
+        // cubo 1
+        if (obj_atual_stand18 >= 1){
+            model = Matrix_Translate(posicoes_estandes[18-1].x, posicoes_estandes[18-1].y + 5.0f - cai_obj1, posicoes_estandes[18-1].z - 0.3f)
+                * Matrix_Scale(0.08f, 0.08f, 0.08f);
+            glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(object_id_uniform, CUBO);
+            DrawVirtualObject("cubo");
 
-        posMin = model * obj_min_vec4;
-        posMax = model * obj_max_vec4;
+            obj_min = g_VirtualScene["cubo"].bbox_min;
+            obj_max = g_VirtualScene["cubo"].bbox_max;
+            obj_min_vec4 = glm::vec4(obj_min.x, obj_min.y, obj_min.z, 1.0f);
+            obj_max_vec4 = glm::vec4(obj_max.x, obj_max.y, obj_max.z, 1.0f);
 
-        struct sphere_obj obj4;
-        obj4.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
-        obj4.r = absolute_float(posMax.x - obj4.c.x);
+            posMin = model * obj_min_vec4;
+            posMax = model * obj_max_vec4;
 
-        if (interseccao_esfera_esfera(obj3, obj4)){
-            printf("INTERSECAO\n");
-        } else {
-            printf("NOOOOO\n");
+            struct box_obj obj_caixa1;
+            obj_caixa1.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
+            obj_caixa1.x_size = absolute_float(posMax.x - obj_caixa1.c.x);
+            obj_caixa1.y_size = absolute_float(posMax.y - obj_caixa1.c.y);
+            obj_caixa1.z_size = absolute_float(posMax.z - obj_caixa1.c.z);
+
+            if (!interseccao_caixa_plano(obj_caixa1, obj_plano)){
+                cai_obj1 += passo_tempo/2.0f;
+            } else {
+                obj_atual_stand18 = 2;
+            }
+
+
         }
+
+        // cubo 2
+        if (obj_atual_stand18 >=2){
+            model = Matrix_Translate(posicoes_estandes[18-1].x + 0.1f, posicoes_estandes[18-1].y + 5.0f /*+ object_fall*/, posicoes_estandes[18-1].z - 0.3f)
+                * Matrix_Scale(0.08f, 0.08f, 0.08f);
+            glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(object_id_uniform, CUBO);
+            DrawVirtualObject("cubo");
+
+            obj_min = g_VirtualScene["cubo"].bbox_min;
+            obj_max = g_VirtualScene["cubo"].bbox_max;
+            obj_min_vec4 = glm::vec4(obj_min.x, obj_min.y, obj_min.z, 1.0f);
+            obj_max_vec4 = glm::vec4(obj_max.x, obj_max.y, obj_max.z, 1.0f);
+
+            posMin = model * obj_min_vec4;
+            posMax = model * obj_max_vec4;
+
+            struct box_obj obj_caixa2;
+            obj_caixa2.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
+            obj_caixa2.x_size = absolute_float(posMax.x - obj_caixa2.c.x);
+            obj_caixa2.y_size = absolute_float(posMax.y - obj_caixa2.c.y);
+            obj_caixa2.z_size = absolute_float(posMax.z - obj_caixa2.c.z);
+        }
+
+        // esfera 1
+        if (obj_atual_stand18 >= 3){
+            model = Matrix_Translate(posicoes_estandes[18-1].x + 0.5, posicoes_estandes[18-1].y + 5.0f, posicoes_estandes[18-1].z - 0.3f)
+                * Matrix_Scale(0.12f, 0.12f, 0.12f);
+            glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(object_id_uniform, ESFERA);
+            DrawVirtualObject("esfera");
+
+            obj_min = g_VirtualScene["esfera"].bbox_min;
+            obj_max = g_VirtualScene["esfera"].bbox_max;
+            obj_min_vec4 = glm::vec4(obj_min.x, obj_min.y, obj_min.z, 1.0f);
+            obj_max_vec4 = glm::vec4(obj_max.x, obj_max.y, obj_max.z, 1.0f);
+
+            posMin = model * obj_min_vec4;
+            posMax = model * obj_max_vec4;
+
+            struct sphere_obj obj_esfera1;
+            obj_esfera1.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
+            obj_esfera1.r = absolute_float(posMax.x - obj_esfera1.c.x);
+        }
+
+        //esfera 2
+        if (obj_atual_stand18 >= 4){
+            model = Matrix_Translate(posicoes_estandes[18-1].x + 0.5, posicoes_estandes[18-1].y + 4.9f, posicoes_estandes[18-1].z - 0.3f)
+                * Matrix_Scale(0.12f, 0.12f, 0.12f);
+            glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(object_id_uniform, ESFERA);
+            DrawVirtualObject("esfera");
+
+            obj_min = g_VirtualScene["esfera"].bbox_min;
+            obj_max = g_VirtualScene["esfera"].bbox_max;
+            obj_min_vec4 = glm::vec4(obj_min.x, obj_min.y, obj_min.z, 1.0f);
+            obj_max_vec4 = glm::vec4(obj_max.x, obj_max.y, obj_max.z, 1.0f);
+
+            posMin = model * obj_min_vec4;
+            posMax = model * obj_max_vec4;
+
+            struct sphere_obj obj4;
+            obj4.c = glm::vec3( (posMin.x + posMax.x)/2.0f , (posMin.y + posMax.y)/2.0f, (posMin.z + posMax.z)/2.0f );
+            obj4.r = absolute_float(posMax.x - obj4.c.x);
+        }
+
 
 
         // Pegamos um vértice com coordenadas de modelo (0.5, 0.5, 0.5, 1) e o
@@ -1058,17 +1094,11 @@ void load_look_at_camera(){
 
 bool interseccao_caixa_caixa(struct box_obj obj1, struct box_obj obj2){
     glm::vec3 distancia_centros = (obj1.c - obj2.c);
-    
-    // printf("x: %f // y: %f // z: %f\n", distancia_centros.x, distancia_centros.y, distancia_centros.z);
-    // printf("1y centro: %f\n", obj1.c.y);
-    // printf("1x size : %f\n", obj1.x_size);
-    // printf("2y centro: %f\n", obj2.c.y);
-    // printf("2x size: %f\n", obj2.x_size);
 
     bool x_dist = absolute_float(distancia_centros.x) <= (obj1.x_size + obj2.x_size);
     bool y_dist = absolute_float(distancia_centros.y) <= (obj1.y_size + obj2.y_size);
     bool z_dist = absolute_float(distancia_centros.z) <= (obj1.z_size + obj2.z_size);
-    //printf("%d - %f - %d\n", x_dist, obj1.x_size + obj2.x_size, z_dist);
+
     return (x_dist && y_dist && z_dist);
 }
 
@@ -1077,6 +1107,36 @@ bool interseccao_esfera_esfera(struct sphere_obj obj1, struct sphere_obj obj2){
     float distancia_centros = sqrt( pow(vetor_dist.x,2) + pow(vetor_dist.y,2) + pow(vetor_dist.z,2) );
 
     return distancia_centros <= (obj1.r + obj2.r);
+}
+
+bool interseccao_caixa_esfera(struct box_obj caixa, struct sphere_obj esfera){
+    glm::vec3 distancia_centros = (caixa.c - esfera.c);
+
+    bool x_dist = absolute_float(distancia_centros.x) <= (caixa.x_size + esfera.r);
+    bool y_dist = absolute_float(distancia_centros.y) <= (caixa.y_size + esfera.r);
+    bool z_dist = absolute_float(distancia_centros.z) <= (caixa.z_size + esfera.r);
+
+    return (x_dist && y_dist && z_dist);
+}
+
+bool interseccao_caixa_plano(struct box_obj caixa, struct plane_obj plano){
+    glm::vec3 distancia_centros = (caixa.c - plano.c);
+
+    bool y_dist = absolute_float(distancia_centros.y) <= (caixa.y_size);
+    bool x_dist = absolute_float(distancia_centros.x) <= (caixa.x_size + plano.x_size);
+    bool z_dist = absolute_float(distancia_centros.z) <= (caixa.z_size + plano.z_size);
+
+    return (y_dist && x_dist && z_dist);
+}
+
+bool interseccao_esfera_plano(struct sphere_obj esfera, struct plane_obj plano){
+    glm::vec3 distancia_centros = (esfera.c - plano.c);
+
+    bool y_dist = absolute_float(distancia_centros.y) <= (esfera.r);
+    bool x_dist = absolute_float(distancia_centros.x) <= (esfera.r + plano.x_size);
+    bool z_dist = absolute_float(distancia_centros.z) <= (esfera.r + plano.z_size);
+
+    return (y_dist && x_dist && z_dist);
 }
 
 /// return true if inside museum
