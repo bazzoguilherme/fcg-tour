@@ -269,7 +269,7 @@ void main()
         Kd = vec3(1.0, 0.643, 0.0);
         Ka = vec3(1.000000, 1.000000, 1.000000);
         Ks = vec3(0.8, 0.8, 0.9);
-        q = 120.0;
+        q = 40.0;
     }
     else if (object_id == CUBO)
     {
@@ -573,7 +573,6 @@ void main()
     else
         color = lambert_diffuse_term + ambient_term + phong_specular_term ;
 
-
     if (object_id == ESFERA_BLINN){
 
         vec4 h = normalize(v + l);
@@ -603,7 +602,8 @@ void main()
         if(dot((normalize(p - spotlightPosition)), normalize(spotlightDirection)) < cos(M_PI/2.5)) // graus
             color = lambert_color;
         else
-            color = lambert_diffuse_term + ambient_term + phong_specular_term ;
+           color = lambert_diffuse_term + ambient_term + phong_specular_term ;
+
     }
 
 

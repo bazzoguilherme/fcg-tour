@@ -69,31 +69,52 @@ void main()
     texcoords = texture_coefficients;
 
 
+cor_v = vec3(0.0f, 0.0f, 0.0f);
 
+    // GOURAUD SHADING
+    if ( object_id == ESFERA_GOURAUD )
+    {
+        float q = 40;
+        vec3 Kd = vec3(1.0, 0.843, 0.0);
+        vec3 Ka = vec3(1.000000, 1.000000, 1.000000);
+        vec3 Ks = vec3(0.8,0.8,0.8);
 
+        vec4 spotlightPosition = vec4(-22.0,4,0.0,1.0);
+        vec4 spotlightDirection = vec4(0.0,-1.0,0.0,0.0);
 
-    if (object_id == ESFERA_GOURAUD){
-
-        //vec4 l = normalize(vec4(1.0, 1.0, 0.0, 0.0));
-        vec4 l = normalize(vec4(-22.0,4,0.0,1.0) - position_world);
+        vec4 l = normalize(spotlightPosition - position_world);
 
         vec4 n = normalize(normal);
 
-        float lambert = max(0, dot(n,l));
+        // Espectro da fonte de iluminação
+        vec3 I = vec3(1.0, 1.0, 1.0);
+
+        // Espectro da luz ambiente
+        vec3 Ia = vec3(0.1, 0.1, 0.1);
+
+         // Termo difuso utilizando a lei dos cossenos de Lambert
+        vec3 lambert_diffuse_term = Kd*I*max(0.0,dot(n,l));
+
+        // Termo ambiente
+        vec3 ambient_term = Ka*Ia;
+
+
+
+        float lambert = max(0,dot(n,l));
 
         vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
-        vec4 camera_position = inverse(view)*origin;
+        vec4 camera_position = inverse(view) * origin;
 
         vec4 v = normalize(camera_position - position_world);
 
-        vec4 r = -l + 2*n*(dot(n,l));
+        vec4 r = -l + 2*n*(dot(n, l));
 
-        float q = 10;
         float phong = pow(max(0.0, dot(r, v)), q);
 
-        vec3 Kd = vec3(1.0, 0.643, 0.0);
-        vec3 Ks = vec3(0.8, 0.8, 0.9);
-        cor_v = Kd * (lambert + 0.01) + Ks * phong;
+        if (dot((normalize(position_world - spotlightPosition)), normalize(spotlightDirection)) < cos(3.141529/2.5))
+            cor_v = Kd * (lambert + 0.01);
+        else
+            cor_v = Kd * I * (lambert + 0.01) + ambient_term + Ks * I * phong;
 
     }
 
