@@ -1316,12 +1316,6 @@ bool interseccao_esfera_esfera(struct sphere_obj obj1, struct sphere_obj obj2){
 bool interseccao_caixa_esfera(struct box_obj caixa, struct sphere_obj esfera){
     glm::vec3 distancia_centros = (caixa.c - esfera.c);
 
-    // float d = sqrt( pow(caixa.x_size, 2) + pow(caixa.y_size, 2) + pow(caixa.z_size, 2) );
-    // float dist_c = sqrt( pow(distancia_centros.x, 2) + pow(distancia_centros.y, 2) + pow(distancia_centros.z, 2));
-    // if (dist_c <= d + esfera.r){
-    //     return true;
-    // }
-
     if (absolute_float(distancia_centros.x) > (caixa.x_size + esfera.r)){
         return false;
     }
@@ -1345,21 +1339,7 @@ bool interseccao_caixa_esfera(struct box_obj caixa, struct sphere_obj esfera){
 
     return ( pow(distancia_centros.x - caixa.x_size, 2) + pow(distancia_centros.y - caixa.y_size, 2) )
                         <= pow(esfera.r, 2);
-    // return false;
 
-
-    // bool x_dist = absolute_float(distancia_centros.x) <= (caixa.x_size + esfera.r);
-    // bool y_dist = absolute_float(distancia_centros.y) <= (caixa.y_size + esfera.r);
-    // bool z_dist = absolute_float(distancia_centros.z) <= (caixa.z_size + esfera.r);
-
-    // float d = sqrt( pow(caixa.x_size, 2) + pow(caixa.y_size, 2) /*+ pow(caixa.z_size, 2)  */);
-    // float dist_c = sqrt( pow(distancia_centros.x, 2) + pow(distancia_centros.y, 2) + pow(distancia_centros.z, 2));
-    // if (dist_c <= d + esfera.r){
-    //     if (!(x_dist && y_dist && z_dist))
-    //     return true;
-    // }
-
-    // return (x_dist && y_dist && z_dist);
 }
 
 bool interseccao_caixa_plano(struct box_obj caixa, struct plane_obj plano){
@@ -2661,7 +2641,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         }
 
 
-        float movement = 0.1f;
+        float movement = 0.05f;
         float limit_movement = 0.45f;
         if (key == GLFW_KEY_A && action == GLFW_PRESS && obj_atual_stand18 == 1){
             move_obj1 += (move_obj1 < limit_movement && !libera_obj1) ? movement : 0.0f;
