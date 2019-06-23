@@ -139,6 +139,11 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 template <typename T> int sgn(T val);
 bool check_inside_museum(float x, float z);
+bool check_estande(struct square_bbox estande, float x, float z);
+bool check_estandes(float x, float z);
+bool check_dino(float x, float z);
+bool check_colision(float x, float z);
+
 float F_p1_p2(glm::vec3 v, glm::vec3 a, float x, float z);
 
 float absolute_float(float v);
@@ -195,23 +200,23 @@ float g_posX_5 = 0.0f;
 float g_posY_5 = 0.0f;
 float g_posZ_5 = 0.0f;
 
-float g_scaleX_5 = 0.5f;
-float g_scaleY_5 = 0.5f;
-float g_scaleZ_5 = 0.5f;
+float g_scaleX_5 = 0.25f;
+float g_scaleY_5 = 0.25f;
+float g_scaleZ_5 = 0.25f;
 
 // definições dos pontos para a curva do estande 9
-float p1X_9 = 0.1f;
-float p1Y_9 = 0.1f;
-float p1Z_9 = 0.1f;
-float p2X_9 = 0.5f;
-float p2Y_9 = 0.5f;
-float p2Z_9 = 0.1f;
-float p3X_9 = 1.3f;
-float p3Y_9 = 1.3f;
-float p3Z_9 = 0.1f;
-float p4X_9 = 1.4f;
-float p4Y_9 = 1.4f;
-float p4Z_9 = 0.1f;
+float p1X_9 = 0.6f;
+float p1Y_9 = 4.0f;
+float p1Z_9 = 0.5f;
+float p2X_9 = 0.2f;
+float p2Y_9 = 4.5f;
+float p2Z_9 = 0.2f;
+float p3X_9 = -0.2f;
+float p3Y_9 = 4.7f;
+float p3Z_9 = -0.3f;
+float p4X_9 = -0.5f;
+float p4Y_9 = 4.2f;
+float p4Z_9 = -0.5f;
 
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
 // pressionado no momento atual. Veja função MouseButtonCallback().
@@ -315,6 +320,7 @@ double passo_tempo;
 
 struct square_bbox Museu;
 std::vector<square_bbox> estandes_bbox;
+struct square_bbox Dino;
 
 // Variável que controla o tipo de projeção utilizada: perspectiva ou ortográfica.
 bool g_UsePerspectiveProjection = true;
@@ -740,6 +746,19 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, DINOSSAURO);
         DrawVirtualObject("triceratop");
 
+        glm::vec3 dino_min = g_VirtualScene["triceratop"].bbox_min;
+        glm::vec3 dino_max = g_VirtualScene["triceratop"].bbox_max;
+        glm::vec4 dino_min_vec4 = glm::vec4(dino_min.x, dino_min.y, dino_min.z, 1.0f);
+        glm::vec4 dino_max_vec4 = glm::vec4(dino_max.x, dino_max.y, dino_max.z, 1.0f);
+
+        posMin = model * dino_min_vec4;
+        posMax = model * dino_max_vec4;
+
+        Dino.p1 = glm::vec3(posMin.x - ERRO_COLISAO, 1.0f, posMin.z - ERRO_COLISAO);
+        Dino.p2 = glm::vec3(posMax.x + ERRO_COLISAO, 1.0f, posMin.z - ERRO_COLISAO);
+        Dino.p3 = glm::vec3(posMax.x + ERRO_COLISAO, 1.0f, posMax.z + ERRO_COLISAO);
+        Dino.p4 = glm::vec3(posMin.x - ERRO_COLISAO, 1.0f, posMax.z + ERRO_COLISAO);
+
         // estande 1
         model = Matrix_Translate(posicoes_estandes[1-1].x, posicoes_estandes[1-1].y + 3.68f, posicoes_estandes[1-1].z)
               * Matrix_Scale(0.6f, 0.6f, 0.6f)
@@ -889,7 +908,7 @@ int main(int argc, char* argv[])
         DrawVirtualObject("triangulo");
 
         // estande 5
-        model = Matrix_Translate(posicoes_estandes[5-1].x, posicoes_estandes[5-1].y + 4.0f, posicoes_estandes[5-1].z)
+        model = Matrix_Translate(posicoes_estandes[5-1].x + g_posX_5, posicoes_estandes[5-1].y + 4.4f + + g_posY_5, posicoes_estandes[5-1].z + g_posZ_5)
               * Matrix_Scale(g_scaleX_5, g_scaleY_5, g_scaleZ_5)
               * Matrix_Rotate_X(g_AngleX_5)
               * Matrix_Rotate_Y(g_AngleY_5)
@@ -945,27 +964,10 @@ int main(int argc, char* argv[])
         float t_bezier = ( cos(time_now) - (-1) )/(1 - (-1)) ;
 
          // necessário ajustar valores
-        p1X_9 = posicoes_estandes[9-1].x + 0.6f;
-        p1Y_9 = posicoes_estandes[9-1].y + 4.0f;
-        p1Z_9 = posicoes_estandes[9-1].z + 0.5f;
-
-        p2X_9 = posicoes_estandes[9-1].x + 0.2f;
-        p2Y_9 = posicoes_estandes[9-1].y + 4.5f;
-        p2Z_9 = posicoes_estandes[9-1].z + 0.2f;
-
-        p3X_9 = posicoes_estandes[9-1].x - 0.2f;
-        p3Y_9 = posicoes_estandes[9-1].y + 4.7f;
-        p3Z_9 = posicoes_estandes[9-1].z - 0.3f;
-
-
-        p4X_9 = posicoes_estandes[9-1].x - 0.5f;
-        p4Y_9 = posicoes_estandes[9-1].y + 4.2f;
-        p4Z_9 = posicoes_estandes[9-1].z - 0.5f;
-
-        glm::vec4 p1 (p1X_9, p1Y_9, p1Z_9, 1.0f);
-        glm::vec4 p2 (p2X_9, p2Y_9, p2Z_9, 1.0f);
-        glm::vec4 p3 (p3X_9, p3Y_9, p3Z_9, 1.0f);
-        glm::vec4 p4 (p4X_9, p4Y_9, p4Z_9, 1.0f);
+        glm::vec4 p1 (posicoes_estandes[9-1].x + p1X_9, posicoes_estandes[9-1].y + p1Y_9, posicoes_estandes[9-1].z + p1Z_9, 1.0f);
+        glm::vec4 p2 (posicoes_estandes[9-1].x + p2X_9, posicoes_estandes[9-1].y + p2Y_9, posicoes_estandes[9-1].z + p2Z_9, 1.0f);
+        glm::vec4 p3 (posicoes_estandes[9-1].x + p3X_9, posicoes_estandes[9-1].y + p3Y_9, posicoes_estandes[9-1].z + p3Z_9, 1.0f);
+        glm::vec4 p4 (posicoes_estandes[9-1].x + p4X_9, posicoes_estandes[9-1].y + p4Y_9, posicoes_estandes[9-1].z + p4Z_9, 1.0f);
 
         glm::vec4 deslocamento_9 = bezier(t_bezier, p1, p2, p3, p4);
 
@@ -1411,12 +1413,30 @@ bool check_estandes(float x, float z){
     return colisoes_estandes;
 }
 
+bool check_dino(float x, float z){
+    glm::vec3 p_41 = Dino.p4 - Dino.p1;
+    glm::vec3 p_24 = Dino.p2 - Dino.p4;
+    glm::vec3 p_12 = Dino.p1 - Dino.p2;
+
+    glm::vec3 p_23 = Dino.p2 - Dino.p3;
+    glm::vec3 p_42 = Dino.p4 - Dino.p2;
+    glm::vec3 p_34 = Dino.p3 - Dino.p4;
+
+    bool t1 = F_p1_p2(p_41, Dino.p4, x, z) >= 0 && F_p1_p2(p_24, Dino.p2, x, z) >= 0 && F_p1_p2(p_12, Dino.p1, x, z) >= 0;
+    bool t2 = F_p1_p2(p_23, Dino.p2, x, z) >= 0 && F_p1_p2(p_42, Dino.p4, x, z) >= 0 && F_p1_p2(p_34, Dino.p3, x, z) >= 0;
+
+    if (t1 || t2) {
+        return false;
+    }
+    return true;
+}
+
 float F_p1_p2(glm::vec3 v, glm::vec3 a, float x, float z){
     return v.z*x - v.x*z - v.z*a.x + v.x*a.z;
 }
 
 bool check_colision(float x, float z){
-    return check_inside_museum(x, z) && check_estandes(x, z); //check_dinosaur(x, z);
+    return check_inside_museum(x, z) && check_estandes(x, z) && check_dino(x, z);
 }
 
 // Função que carrega uma imagem para ser utilizada como textura
@@ -2082,7 +2102,7 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         g_LastCursorPosY = ypos;
     }
 
-    if (g_RightMouseButtonPressed)
+    if (g_RightMouseButtonPressed && estande_atual == 3-1)
     {
         // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
         float dx = xpos - g_LastCursorPosX;
@@ -2238,12 +2258,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     }
 
     // Se o usuário apertar a tecla R, recarregamos os shaders dos arquivos "shader_fragment.glsl" e "shader_vertex.glsl".
-    if (key == GLFW_KEY_R && action == GLFW_PRESS)
-    {
-        LoadShadersFromFiles();
-        fprintf(stdout,"Shaders recarregados!\n");
-        fflush(stdout);
-    }
+    // if (key == GLFW_KEY_R && action == GLFW_PRESS)
+    // {
+    //     LoadShadersFromFiles();
+    //     fprintf(stdout,"Shaders recarregados!\n");
+    //     fflush(stdout);
+    // }
 
 
 
@@ -2331,6 +2351,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
     // Ações específicas para cada estande
     // se estande 5
+    delta = 0.05f;
     if (estande_atual == 5-1 && camera_view_ID == 2)
     {
         if (key == GLFW_KEY_X && action == GLFW_PRESS)
@@ -2348,28 +2369,70 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
         if (key == GLFW_KEY_Q && action == GLFW_PRESS)
         {
-            g_posX_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+            if (mod & GLFW_MOD_SHIFT){
+                if (g_posX_5 > -0.45f)
+                    g_posX_5 -= delta;
+            } else {
+                if (g_posX_5 < 0.6f)
+                    g_posX_5 += delta;
+            }
+            //g_posX_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
         }
         if (key == GLFW_KEY_W && action == GLFW_PRESS)
         {
-            g_posY_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+            if (mod & GLFW_MOD_SHIFT){
+                if (g_posY_5 > -0.0f)
+                    g_posY_5 -= delta;
+            } else {
+                if (g_posY_5 < 0.4f)
+                    g_posY_5 += delta;
+            }
+            //g_posY_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
         }
         if (key == GLFW_KEY_E && action == GLFW_PRESS)
         {
-            g_posZ_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+            if (mod & GLFW_MOD_SHIFT){
+                if (g_posZ_5 > -0.45f)
+                    g_posZ_5 -= delta;
+            } else {
+                if (g_posZ_5 < 0.6f)
+                    g_posZ_5 += delta;
+            }
+            //g_posZ_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
         }
-
+        delta = 0.025f;
         if (key == GLFW_KEY_A && action == GLFW_PRESS)
         {
-            g_scaleX_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+            if (mod & GLFW_MOD_SHIFT){
+                if (g_scaleX_5 > 0.05f)
+                    g_scaleX_5 -= delta;
+            } else {
+                if (g_scaleX_5 < 0.6f)
+                    g_scaleX_5 += delta;
+            }
+            //g_scaleX_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
         }
         if (key == GLFW_KEY_S && action == GLFW_PRESS)
         {
-            g_scaleY_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+            if (mod & GLFW_MOD_SHIFT){
+                if (g_scaleY_5 > 0.05f)
+                    g_scaleY_5 -= delta;
+            } else {
+                if (g_scaleY_5 < 0.6f)
+                    g_scaleY_5 += delta;
+            }
+            //g_scaleY_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
         }
         if (key == GLFW_KEY_D && action == GLFW_PRESS)
         {
-            g_scaleZ_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+            if (mod & GLFW_MOD_SHIFT){
+                if (g_scaleZ_5 > 0.05f)
+                    g_scaleZ_5 -= delta;
+            } else {
+                if (g_scaleZ_5 < 0.6f)
+                    g_scaleZ_5 += delta;
+            }
+            //g_scaleZ_5 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
         }
 
         if ((key == GLFW_KEY_SPACE || key == GLFW_KEY_ESCAPE) && action == GLFW_PRESS)
@@ -2388,45 +2451,141 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         }
     }
 
-    float delta_9 = 0.5f;
+    delta = 0.05f;
         // se estande 9
     if (estande_atual == 9-1 && camera_view_ID == 2)
     {
         // P1
         if (key == GLFW_KEY_Q && action == GLFW_PRESS)
         {
-            p1X_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+            if (mod & GLFW_MOD_SHIFT){
+                if (p1X_9 < 0.6f)
+                    p1X_9 += delta;
+            } else {
+                if (p1X_9 > -0.6f)
+                    p1X_9 -= delta;
+            }
+            //p1X_9 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
         }
         if (key == GLFW_KEY_A && action == GLFW_PRESS)
         {
-            p1Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+            if (mod & GLFW_MOD_SHIFT){
+                if (p1Y_9 < 5.0f)
+                    p1Y_9 += delta;
+            } else {
+                if (p1Y_9 > 4.2f)
+                    p1Y_9 -= delta;
+            }
+            //p1Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+        if (key == GLFW_KEY_Z && action == GLFW_PRESS)
+        {
+            if (mod & GLFW_MOD_SHIFT){
+                if (p1Z_9 < 0.6f)
+                    p1Z_9 += delta;
+            } else {
+                if (p1Z_9 > -0.6f)
+                    p1Z_9 -= delta;
+            }
         }
         // P2
         if (key == GLFW_KEY_W && action == GLFW_PRESS)
         {
-            p2X_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+            if (mod & GLFW_MOD_SHIFT){
+                if (p2X_9 < 0.6f)
+                    p2X_9 += delta;
+            } else {
+                if (p2X_9 > -0.6f)
+                    p2X_9 -= delta;
+            }
+            //p2X_9 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
         }
         if (key == GLFW_KEY_S && action == GLFW_PRESS)
         {
-            p2Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+            if (mod & GLFW_MOD_SHIFT){
+                if (p2Y_9 < 5.0f)
+                    p2Y_9 += delta;
+            } else {
+                if (p2Y_9 > 4.2f)
+                    p2Y_9 -= delta;
+            }
+            //p2Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+        if (key == GLFW_KEY_X && action == GLFW_PRESS)
+        {
+            if (mod & GLFW_MOD_SHIFT){
+                if (p2Z_9 < 0.6f)
+                    p2Z_9 += delta;
+            } else {
+                if (p2Z_9 > -0.6f)
+                    p2Z_9 -= delta;
+            }
         }
         // P3
         if (key == GLFW_KEY_E && action == GLFW_PRESS)
         {
-            p3X_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+            if (mod & GLFW_MOD_SHIFT){
+                if (p3X_9 < 0.6f)
+                    p3X_9 += delta;
+            } else {
+                if (p3X_9 > -0.6f)
+                    p3X_9 -= delta;
+            }
+            //p3X_9 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
         }
         if (key == GLFW_KEY_D && action == GLFW_PRESS)
         {
-            p3Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+            if (mod & GLFW_MOD_SHIFT){
+                if (p3Y_9 < 5.0f)
+                    p3Y_9 += delta;
+            } else {
+                if (p3Y_9 > 4.2f)
+                    p3Y_9 -= delta;
+            }
+            //p3Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+        if (key == GLFW_KEY_C && action == GLFW_PRESS)
+        {
+            if (mod & GLFW_MOD_SHIFT){
+                if (p3Z_9 < 0.6f)
+                    p3Z_9 += delta;
+            } else {
+                if (p3Z_9 > -0.6f)
+                    p3Z_9 -= delta;
+            }
         }
         // P4
         if (key == GLFW_KEY_R && action == GLFW_PRESS)
         {
-            p4X_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+            if (mod & GLFW_MOD_SHIFT){
+                if (p4X_9 < 0.6f)
+                    p4X_9 += delta;
+            } else {
+                if (p4X_9 > -0.6f)
+                    p4X_9 -= delta;
+            }
+            //p4X_9 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
         }
         if (key == GLFW_KEY_F && action == GLFW_PRESS)
         {
-            p4Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta_9 : delta_9;
+            if (mod & GLFW_MOD_SHIFT){
+                if (p4Y_9 < 5.0f)
+                    p4Y_9 += delta;
+            } else {
+                if (p4Y_9 > 4.2f)
+                    p4Y_9 -= delta;
+            }
+            //p4Y_9 += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
+        }
+        if (key == GLFW_KEY_V && action == GLFW_PRESS)
+        {
+            if (mod & GLFW_MOD_SHIFT){
+                if (p4Z_9 < 0.6f)
+                    p4Z_9 += delta;
+            } else {
+                if (p4Z_9 > -0.6f)
+                    p4Z_9 -= delta;
+            }
         }
 
 
@@ -2860,8 +3019,10 @@ void informative_text_stand(GLFWwindow* window){
         } else
         if (estande_atual == 5-1){
             TextRendering_PrintString(window, "Transformacoes:", -1.0f, 1.0f-lineheight, 1.0f);
-            TextRendering_PrintString(window, "   .", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "   .", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Q/W/E: Transladar", -1.0f, 1.0f-2*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   A/S/D: Escalar", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Z/X/C: Rotacionar", -1.0f, 1.0f-4*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   (key + SHIFT) realiza a transformacao de forma contraria", -1.0f, 1.0f-5*lineheight, 1.0f);
         } else
         if (estande_atual == 6-1){
             TextRendering_PrintString(window, "Euler Angles / Gimbal Lock:", -1.0f, 1.0f-lineheight, 1.0f);
@@ -2882,7 +3043,11 @@ void informative_text_stand(GLFWwindow* window){
         if (estande_atual == 9-1){
             TextRendering_PrintString(window, "Curvas de Bezier:", -1.0f, 1.0f-lineheight, 1.0f);
             TextRendering_PrintString(window, "   Objeto se movendo na tela sobre a estande a partir de curvas de Bezier.", -1.0f, 1.0f-2*lineheight, 1.0f);
-            TextRendering_PrintString(window, "   *Alterar pontos*.", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   Q/A/Z: altera P1", -1.0f, 1.0f-3*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   W/S/X: altera P2", -1.0f, 1.0f-4*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   E/D/C: altera P3", -1.0f, 1.0f-5*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   R/F/V: altera P4", -1.0f, 1.0f-6*lineheight, 1.0f);
+            TextRendering_PrintString(window, "   (key + SHIFT) para movimento contrario.", -1.0f, 1.0f-7*lineheight, 1.0f);
         } else
         if (estande_atual == 10-1){
             TextRendering_PrintString(window, "Alteracao de textura:", -1.0f, 1.0f-lineheight, 1.0f);

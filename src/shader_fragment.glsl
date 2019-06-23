@@ -178,8 +178,17 @@ void main()
     }
     else if (object_id == VACA)
     {
-        U = texcoords.x;
-        V = texcoords.y;
+        vec4 c = (bbox_min + bbox_max) / 2.0;
+
+        vec4 p_line = c + normalize(position_model - c);
+
+        vec4 p_vec = p_line - c;
+
+        float theta = atan(p_vec.x, p_vec.z);
+        float phi = asin(p_vec.y);
+
+        U = (theta+M_PI)/(2*M_PI);
+        V = (phi + (M_PI/2))/M_PI;
         Kd = texture(TextureImage6, vec2(U,V)).rgb ;
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
