@@ -39,6 +39,7 @@ uniform mat4 projection;
 #define VETOR_RESULTANTE 17
 #define PLANO 18
 #define ESFERA_GOURAUD 20
+#define ESFERA_BLINN 21
 
 
 uniform int object_id;
@@ -259,7 +260,7 @@ void main()
         Ks = vec3(0.500000, 0.500000, 0.500000);
         q = 20.0;
     }
-    else if (object_id == ESFERA)
+    else if (object_id == ESFERA || object_id == ESFERA_BLINN)
     {
         U = texcoords.x;
         V = texcoords.y;
@@ -268,7 +269,7 @@ void main()
         Kd = vec3(1.0, 0.643, 0.0);
         Ka = vec3(1.000000, 1.000000, 1.000000);
         Ks = vec3(0.8, 0.8, 0.9);
-        q = 10.0;
+        q = 120.0;
     }
     else if (object_id == CUBO)
     {
@@ -573,29 +574,38 @@ void main()
         color = lambert_diffuse_term + ambient_term + phong_specular_term ;
 
 
-/*    if (object_id == ESFERA_GOURAUD){
-        vec4 l = normalize(vec4(1.0, 1.0, 0.0, 0.0));
+    if (object_id == ESFERA_BLINN){
 
-        vec4 n = normalize(normal);
+        vec4 h = normalize(v + l);
 
-        float lambert = max(0, dot(n,l));
+        // Equação de Iluminação
+        float lambert = max(0,dot(n,l));
 
-        vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
-        vec4 camera_position = inverse(view)*origin;
+        lambert_color = Kd * (lambert + 0.01);
 
-        vec4 v = normalize(camera_position - position_world);
 
-        vec4 r = -l + 2*n*(dot(n,l));
+        // Espectro da fonte de iluminação
+        vec3 I = vec3(1.0, 1.0, 1.0);
 
-        float q = 10;
-        float phong = pow(max(0.0, dot(r, v)), q);
+        // Espectro da luz ambiente
+        vec3 Ia = vec3(0.1, 0.1, 0.1);
 
-        vec3 Kd = vec3(1.0, 0.643, 0.0);
-        vec3 Ks = vec3(0.8, 0.8, 0.9);
-        cor_v = Kd * (lambert + 0.01) + Ks * phong;
+        // Termo difuso utilizando a lei dos cossenos de Lambert
+        vec3 lambert_diffuse_term = Kd*I*max(0.0,dot(n,l));
 
+        // Termo ambiente
+        vec3 ambient_term = Ka*Ia;
+
+        // Termo especular utilizando o modelo de iluminação de Phong
+        vec3 phong_specular_term  = Ks*I*pow(max(0.0, dot(n,h)),q);
+
+        // Cor final do fragmento calculada com uma combinação dos termos difuso, especular, e ambiente.
+        if(dot((normalize(p - spotlightPosition)), normalize(spotlightDirection)) < cos(M_PI/2.5)) // graus
+            color = lambert_color;
+        else
+            color = lambert_diffuse_term + ambient_term + phong_specular_term ;
     }
-*/
+
 
     if (object_id == ESFERA_GOURAUD){
         color = cor_v;

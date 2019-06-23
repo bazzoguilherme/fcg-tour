@@ -657,6 +657,7 @@ int main(int argc, char* argv[])
         #define PLANO 18
         #define CUBO_HIERARQUICA 18
         #define ESFERA_GOURAUD 20
+        #define ESFERA_BLINN 21
 
         glm::vec3 obj_min;
         glm::vec3 obj_max;
@@ -987,18 +988,25 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, LAMPADA);
         DrawVirtualObject("lampada");
 
+        // estande 11
+        model = Matrix_Translate(posicoes_estandes[11-1].x, posicoes_estandes[11-1].y + 4.2f, posicoes_estandes[11-1].z)
+              * Matrix_Scale(0.5f, 0.5f, 0.5f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, ESFERA_GOURAUD);
+        DrawVirtualObject("esfera");
+
         // estande 12
         model = Matrix_Translate(posicoes_estandes[12-1].x, posicoes_estandes[12-1].y + 4.2f, posicoes_estandes[12-1].z)
               * Matrix_Scale(0.5f, 0.5f, 0.5f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESFERA_GOURAUD);
+        glUniform1i(object_id_uniform, ESFERA);
         DrawVirtualObject("esfera");
 
         // estande 13
         model = Matrix_Translate(posicoes_estandes[13-1].x, posicoes_estandes[13-1].y + 4.2f, posicoes_estandes[13-1].z)
               * Matrix_Scale(0.5f, 0.5f, 0.5f);
         glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(object_id_uniform, ESFERA);
+        glUniform1i(object_id_uniform, ESFERA_BLINN);
         DrawVirtualObject("esfera");
 
         // estande 14
