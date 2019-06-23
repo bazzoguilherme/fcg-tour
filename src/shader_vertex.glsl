@@ -11,6 +11,9 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+#define ESFERA_GOURAUD 20
+uniform int object_id;
+
 // Atributos de vértice que serão gerados como saída ("out") pelo Vertex Shader.
 // ** Estes serão interpolados pelo rasterizador! ** gerando, assim, valores
 // para cada fragmento, os quais serão recebidos como entrada pelo Fragment
@@ -19,6 +22,7 @@ out vec4 position_world;
 out vec4 position_model;
 out vec4 normal;
 out vec2 texcoords;
+out vec3 cor_v;
 
 void main()
 {
@@ -63,5 +67,36 @@ void main()
 
     // Coordenadas de textura obtidas do arquivo OBJ (se existirem!)
     texcoords = texture_coefficients;
+
+
+
+
+
+    if (object_id == ESFERA_GOURAUD){
+
+        //vec4 l = normalize(vec4(1.0, 1.0, 0.0, 0.0));
+        vec4 l = normalize(vec4(-22.0,4,0.0,1.0) - position_world);
+
+        vec4 n = normalize(normal);
+
+        float lambert = max(0, dot(n,l));
+
+        vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
+        vec4 camera_position = inverse(view)*origin;
+
+        vec4 v = normalize(camera_position - position_world);
+
+        vec4 r = -l + 2*n*(dot(n,l));
+
+        float q = 10;
+        float phong = pow(max(0.0, dot(r, v)), q);
+
+        vec3 Kd = vec3(1.0, 0.643, 0.0);
+        vec3 Ks = vec3(0.8, 0.8, 0.9);
+        cor_v = Kd * (lambert + 0.01) + Ks * phong;
+
+    }
+
+
 }
 

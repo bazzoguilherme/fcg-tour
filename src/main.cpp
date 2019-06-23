@@ -656,6 +656,7 @@ int main(int argc, char* argv[])
         #define VETOR_RESULTANTE 17
         #define PLANO 18
         #define CUBO_HIERARQUICA 18
+        #define ESFERA_GOURAUD 20
 
         glm::vec3 obj_min;
         glm::vec3 obj_max;
@@ -986,6 +987,13 @@ int main(int argc, char* argv[])
         glUniform1i(object_id_uniform, LAMPADA);
         DrawVirtualObject("lampada");
 
+        // estande 12
+        model = Matrix_Translate(posicoes_estandes[12-1].x, posicoes_estandes[12-1].y + 4.2f, posicoes_estandes[12-1].z)
+              * Matrix_Scale(0.5f, 0.5f, 0.5f);
+        glUniformMatrix4fv(model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(object_id_uniform, ESFERA_GOURAUD);
+        DrawVirtualObject("esfera");
+
         // estande 13
         model = Matrix_Translate(posicoes_estandes[13-1].x, posicoes_estandes[13-1].y + 4.2f, posicoes_estandes[13-1].z)
               * Matrix_Scale(0.5f, 0.5f, 0.5f);
@@ -1082,7 +1090,6 @@ int main(int argc, char* argv[])
                 } else {
                     obj_atual_stand18 = 2;
                 }
-
 
         }
 

@@ -38,6 +38,7 @@ uniform mat4 projection;
 #define VETOR_MOVE 16
 #define VETOR_RESULTANTE 17
 #define PLANO 18
+#define ESFERA_GOURAUD 20
 
 
 uniform int object_id;
@@ -79,6 +80,8 @@ uniform int direcao_planar = 1;
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec3 color;
 vec3 lambert_color;
+
+in vec3 cor_v;
 
 // Parâmetros que definem as propriedades espectrais da superfície
 vec3 Kd; // Refletância difusa
@@ -234,7 +237,7 @@ void main()
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
         //Kd = vec3(0.640000, 0.640000, 0.640000);
-        Ks = vec3(0.500000, 0.500000, 0.500000);
+        Ks = vec3(0.800000, 0.800000, 0.800000);
         q = 20.0;
     }
     else if (object_id == VACA)
@@ -262,9 +265,10 @@ void main()
         V = texcoords.y;
         Kd = texture(TextureImage7, vec2(U,V)).rgb ;
 
+        Kd = vec3(1.0, 0.643, 0.0);
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        Ks = vec3(0.8, 0.8, 0.8);
-        q = 100.0;
+        Ks = vec3(0.8, 0.8, 0.9);
+        q = 10.0;
     }
     else if (object_id == CUBO)
     {
@@ -369,8 +373,8 @@ void main()
 
 
         Ka = vec3(1.000000, 1.000000, 1.000000);
-        Ks = vec3(0.500000, 0.500000, 0.500000);
-        q = 20.0;
+        Ks = vec3(0.700000, 0.700000, 0.700000);
+        q = 10.0;
     }
     else if (object_id == CHALEIRA_PLANA)
     {
@@ -551,7 +555,7 @@ void main()
     vec3 I = vec3(1.0, 1.0, 1.0);
 
     // Espectro da luz ambiente
-    vec3 Ia = vec3(0.2, 0.2, 0.2);
+    vec3 Ia = vec3(0.1, 0.1, 0.1);
 
     // Termo difuso utilizando a lei dos cossenos de Lambert
     vec3 lambert_diffuse_term = Kd*I*max(0.0,dot(n,l));
@@ -567,6 +571,35 @@ void main()
         color = lambert_color;
     else
         color = lambert_diffuse_term + ambient_term + phong_specular_term ;
+
+
+/*    if (object_id == ESFERA_GOURAUD){
+        vec4 l = normalize(vec4(1.0, 1.0, 0.0, 0.0));
+
+        vec4 n = normalize(normal);
+
+        float lambert = max(0, dot(n,l));
+
+        vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
+        vec4 camera_position = inverse(view)*origin;
+
+        vec4 v = normalize(camera_position - position_world);
+
+        vec4 r = -l + 2*n*(dot(n,l));
+
+        float q = 10;
+        float phong = pow(max(0.0, dot(r, v)), q);
+
+        vec3 Kd = vec3(1.0, 0.643, 0.0);
+        vec3 Ks = vec3(0.8, 0.8, 0.9);
+        cor_v = Kd * (lambert + 0.01) + Ks * phong;
+
+    }
+*/
+
+    if (object_id == ESFERA_GOURAUD){
+        color = cor_v;
+    }
 
 
     // Cor final com correção gamma, considerando monitor sRGB.
