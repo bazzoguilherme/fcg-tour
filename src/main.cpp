@@ -3049,7 +3049,7 @@ void informative_text_stand(GLFWwindow* window){
             TextRendering_PrintString(window, "   Podes aqui alterar a textura sobre a lampada com as teclas 1-6.", -1.0f, 1.0f-2*lineheight, 1.0f);
         } else
         if (estande_atual == 11-1){
-            TextRendering_PrintString(window, "GOuraud Shading:", -1.0f, 1.0f-lineheight, 1.0f);
+            TextRendering_PrintString(window, "Gouraud Shading:", -1.0f, 1.0f-lineheight, 1.0f);
         } else
         if (estande_atual == 12-1){
             TextRendering_PrintString(window, "Phong Shading:", -1.0f, 1.0f-lineheight, 1.0f);
